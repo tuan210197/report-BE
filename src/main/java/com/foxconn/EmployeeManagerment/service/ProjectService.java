@@ -1,0 +1,44 @@
+package com.foxconn.EmployeeManagerment.service;
+
+import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
+import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
+import com.foxconn.EmployeeManagerment.dto.response.ChartDto;
+import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted;
+import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2;
+import com.foxconn.EmployeeManagerment.entity.Project;
+import com.foxconn.EmployeeManagerment.projection.ProjectProjection;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public interface ProjectService {
+
+    Project getProjectByUser(String userId);
+    Project getAllproject();
+    Long createProject(ProjectDTO project, String userId) throws  Exception;
+    Boolean updateProject(String userId, ProjectDTO project);
+
+    List<Project> getAllProject();
+
+
+    List<Project> findProjectByUserId(String uid);
+
+
+    Boolean checkOwnerProject(String uid, Long projectId);
+
+
+    List<ChartDto> getDashboard();
+
+    List<CategoryCountDTO> getTotal();
+
+    List<ProjectCompleted> getCompleted();
+
+    List<ProjectProjection> getProjectName();
+
+    List<ProjectCompleted2> getCompleted2();
+
+    boolean updateStatus(ProjectDTO projectDTO);
+
+    List<Project>  search(String projectName);
+}
