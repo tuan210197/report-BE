@@ -4,9 +4,8 @@ import com.foxconn.EmployeeManagerment.entity.Implement;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.util.List;
-import java.util.Optional;
+
 
 public interface ImplementRepository extends JpaRepository<Implement, Long> {
     @Query("SELECT i FROM Implement i where i.users.uid = :userImplement")

@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Service cho Angular
+  frontend:
+    build:
+      context: ./frontend  # Đảm bảo đường dẫn đến thư mục chứa Dockerfile của Angular
+    ports:
+      - "80:80"  # Mở port 80 của container ra ngoài host
+    networks:
+      - app-network  # Kết nối vào mạng riêng của ứng dụng
+    depends_on:
+      - backend  # Đảm bảo frontend chạy sau backend
+
+  # Service cho Spring Boot
+  backend:
+    build:
+      context: ./backend  # Đảm bảo đường dẫn đến thư mục chứa Dockerfile của Spring Boot
+    ports:
+      - "8080:8080"  # Mở port 8080 của container ra ngoài host
+    networks:
+      - app-network  # Kết nối vào mạng riêng của ứng dụng
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/fc  # Cập nhật URL cơ sở dữ liệu ngoài Docker
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123456
+
+# Định nghĩa mạng riêng cho các container giao tiếp với nhau
+networks:
+  app-network:
+    driver: bridge
