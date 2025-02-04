@@ -71,7 +71,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<ProjectCompleted2> getCompleted2();
 
     @Query("SELECT p.projectId AS projectId, p.projectName AS projectName FROM Project p WHERE p.completed = FALSE ")
-    List<ProjectProjection> getProjectName();
+    List<ProjectProjection>  getProjectName();
 
 
     @Query("SELECT p FROM Project p " +
