@@ -35,7 +35,7 @@ public class CookieCleanupFilter implements Filter {
                     if (jwtTokenUtil.isTokenExpired(token)) {
                         Cookie expiredCookie = new Cookie("token", null);
                         expiredCookie.setHttpOnly(true);
-                        expiredCookie.setSecure(true);
+                        expiredCookie.setSecure(false);
                         expiredCookie.setPath("/");
                         expiredCookie.setMaxAge(0);
                         response.addCookie(expiredCookie);

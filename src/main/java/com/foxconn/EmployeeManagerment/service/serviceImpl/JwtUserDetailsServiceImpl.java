@@ -1,6 +1,5 @@
 package com.foxconn.EmployeeManagerment.service.serviceImpl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.controller.BaseController;
 import com.foxconn.EmployeeManagerment.dto.request.UserInfoDTO;
@@ -14,12 +13,10 @@ import com.foxconn.EmployeeManagerment.repository.BasicLoginRepository;
 import com.foxconn.EmployeeManagerment.repository.DepartmentRepository;
 import com.foxconn.EmployeeManagerment.repository.RoleRepository;
 import com.foxconn.EmployeeManagerment.repository.UserRepository;
-import com.foxconn.EmployeeManagerment.security.JwtTokenUtil;
 import com.foxconn.EmployeeManagerment.service.JwtUserDetailsService;
 import com.foxconn.EmployeeManagerment.service.MailSenderService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -41,37 +38,24 @@ import java.util.*;
 public class JwtUserDetailsServiceImpl extends BaseController implements JwtUserDetailsService {
 
     @Lazy
-    @Autowired
     private final BasicLoginRepository basicLoginRepo;
 
-    @Autowired
     private final UserRepository userRepo;
 
-    @Autowired
     private final PasswordEncoder bcryptEncoder;
 
-    @Autowired
     private final MailSenderService mailSenderService;
 
-    @Autowired
-    private final ObjectMapper objectMapper;
-
-    @Autowired
-    private final JwtTokenUtil jwtTokenUtil;
-
-    @Autowired
     private final DepartmentRepository departmentRepository;
 
-    @Autowired
     private final RoleRepository roleRepository;
 
-    public JwtUserDetailsServiceImpl(BasicLoginRepository basicLoginRepo, UserRepository userRepo, PasswordEncoder bcryptEncoder, MailSenderService mailSenderService, ObjectMapper objectMapper, JwtTokenUtil jwtTokenUtil, DepartmentRepository departmentRepository, RoleRepository roleRepository) {
+    public JwtUserDetailsServiceImpl(BasicLoginRepository basicLoginRepo, UserRepository userRepo, PasswordEncoder bcryptEncoder, MailSenderService mailSenderService, DepartmentRepository departmentRepository, RoleRepository roleRepository) {
         this.basicLoginRepo = basicLoginRepo;
         this.userRepo = userRepo;
         this.bcryptEncoder = bcryptEncoder;
         this.mailSenderService = mailSenderService;
-        this.objectMapper = objectMapper;
-        this.jwtTokenUtil = jwtTokenUtil;
+
         this.departmentRepository = departmentRepository;
         this.roleRepository = roleRepository;
     }
@@ -86,8 +70,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         String roles = role.getName();
 
         return User.withUsername(basicLogin.getEmail()).password(basicLogin.getPassword()).authorities(roles).build();
-//                new User(basicLogin.getEmail(), basicLogin.getPassword(),
-//                new ArrayList<>());
+
     }
 
     @Override
@@ -177,7 +160,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
 
     @Override
-    public boolean registerUser(UserLoginDTO user) throws Exception {
+    public boolean registerUser(UserLoginDTO user)  {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
         Assert.isTrue(ValidateUtil.regexValidation(user.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
         BasicLogin checkBasicLogin = basicLoginRepo.findByEmail(user.getEmail());

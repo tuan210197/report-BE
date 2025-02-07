@@ -10,7 +10,6 @@ import com.foxconn.EmployeeManagerment.dto.request.UserLoginDTO;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.stereotype.Service;
 
 
 /**
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
  * when authenticating the user details provided by the user.
  */
 
-@Service
 public interface JwtUserDetailsService extends UserDetailsService {
 
     UserDetails loadUserByUsername(String username) throws UsernameNotFoundException;

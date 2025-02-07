@@ -5,20 +5,15 @@ import com.foxconn.EmployeeManagerment.dto.request.UserInfoDTO;
 import com.foxconn.EmployeeManagerment.dto.request.UserLoginDTO;
 import com.foxconn.EmployeeManagerment.dto.request.JwtRequest;
 import com.foxconn.EmployeeManagerment.dto.response.JwtResponse;
-import com.foxconn.EmployeeManagerment.entity.Project;
-import com.foxconn.EmployeeManagerment.repository.ProjectRepository;
+
 import com.foxconn.EmployeeManagerment.security.JwtTokenUtil;
 import com.foxconn.EmployeeManagerment.service.JwtUserDetailsService;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.impl.DefaultClaims;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -49,16 +44,17 @@ public class AuthenController extends BaseController {
 //    @Autowired
     private final JwtUserDetailsService userDetailsService;
 
-
-    public AuthenController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService, ProjectRepository projectRepository) {
+//, ProjectRepository projectRepository
+    public AuthenController(AuthenticationManager authenticationManager, JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService) {
         this.authenticationManager = authenticationManager;
         this.jwtTokenUtil = jwtTokenUtil;
         this.userDetailsService = userDetailsService;
+
     }
 
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> createAuthenticationToken(HttpServletRequest request, @RequestBody JwtRequest authenticationRequest) {
+    public ResponseEntity<?> createAuthenticationToken(HttpServletRequest request, @RequestBody JwtRequest authenticationRequest, HttpServletResponse response) {
 
         try {
             String requestId = request.getHeader("request-id");
@@ -74,13 +70,15 @@ public class AuthenController extends BaseController {
             UserInfoDTO userInfoDTO = userDetailsService.getUserInfo(uid);
             String token = jwtTokenUtil.generateToken(userInfoDTO);
 
+
             // Create HttpOnly cookie
             ResponseCookie cookie = ResponseCookie.from("token", token)
                     .httpOnly(true)
-                    .secure(true) // Chỉ bật nếu dùng HTTPS
+                    .secure(false) // Chỉ bật nếu dùng HTTPS
                     .path("/")
                     .maxAge(7 * 24 * 60 * 60) // Cookie tồn tại trong 7 ngày
-                    .sameSite("Strict") // Điều chỉnh nếu bạn muốn cho phép truy cập từ subdomain hoặc cross-origin
+//                    .sameSite("Strict") // Điều chỉnh nếu bạn muốn cho phép truy cập từ subdomain hoặc cross-origin
+                    .sameSite("Lux")
                     .build();
 
             // Add the cookie to the response header

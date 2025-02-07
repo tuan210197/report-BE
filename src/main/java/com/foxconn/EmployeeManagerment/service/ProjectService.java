@@ -7,11 +7,9 @@ import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted;
 import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2;
 import com.foxconn.EmployeeManagerment.entity.Project;
 import com.foxconn.EmployeeManagerment.projection.ProjectProjection;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface ProjectService {
 
     Project getProjectByUser(String userId);

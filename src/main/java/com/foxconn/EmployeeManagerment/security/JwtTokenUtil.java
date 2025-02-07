@@ -158,7 +158,7 @@ public class JwtTokenUtil implements Serializable {
 
                         Cookie accessTokenCookie = new Cookie("token", newAccessToken);
                         accessTokenCookie.setHttpOnly(true); // Chỉ có server có thể truy cập
-                        accessTokenCookie.setSecure(true); // Yêu cầu HTTPS
+                        accessTokenCookie.setSecure(false); // Yêu cầu HTTPS
                         accessTokenCookie.setPath("/"); // Cookie có hiệu lực trên toàn ứng dụng
                         accessTokenCookie.setMaxAge( 5 * 60); // Thời gian sống (15 phút)
                         response.addCookie(accessTokenCookie); // Gửi cookie về client

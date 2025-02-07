@@ -1,11 +1,9 @@
 package com.foxconn.EmployeeManagerment.service;
 
 import com.foxconn.EmployeeManagerment.entity.WeeklyReport;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Service
 public interface WeeklyReportService {
 
     WeeklyReport createWeeklyReport(WeeklyReport weeklyReport);
