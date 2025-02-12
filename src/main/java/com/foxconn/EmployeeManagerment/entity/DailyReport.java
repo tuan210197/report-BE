@@ -64,10 +64,10 @@ public class DailyReport {
     @Column(name = "progress", nullable = false)
     private Long progress;
 
-    @Column(name = "start_date",nullable = false)
+    @Column(name = "start_date")
     private LocalDate startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(name = "end_date")
     private LocalDate endDate;
 
     @ManyToOne

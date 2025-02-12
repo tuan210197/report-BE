@@ -25,7 +25,7 @@ public class Project {
     @Column(name = "project_id")
     private Long projectId;
 
-    @Column(name = "project_name", nullable = false)
+    @Column(name = "project_name")
     private String projectName;
 
     @Column(name = "description")
@@ -91,13 +91,16 @@ public class Project {
     @Column(name = "completed")
     private Boolean completed;
 
+    @Column(name = "canceled ")
+    private Boolean canceled;
+
     @JsonIgnore
     @OneToMany(mappedBy = "projects", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Implement> implement;
 
 //    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "category_id", nullable = false)
+    @JoinColumn(name = "category_id")
     private Category category;
 
     @JsonIgnore
@@ -106,7 +109,7 @@ public class Project {
 
 //    @JsonIgnore
     @ManyToOne
-    @JoinColumn(name = "pic", nullable = false)
+    @JoinColumn(name = "pic")
     private Users pic;
 
     @JsonIgnore

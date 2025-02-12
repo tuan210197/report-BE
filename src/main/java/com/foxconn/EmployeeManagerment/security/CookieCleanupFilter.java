@@ -40,7 +40,6 @@ public class CookieCleanupFilter implements Filter {
                         expiredCookie.setMaxAge(0);
                         response.addCookie(expiredCookie);
                     }
-
                 }
             }
         }

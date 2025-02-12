@@ -5,6 +5,8 @@ import com.foxconn.EmployeeManagerment.entity.*;
 import com.foxconn.EmployeeManagerment.repository.*;
 import com.foxconn.EmployeeManagerment.service.DailyReportService;
 import io.jsonwebtoken.lang.Assert;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -68,6 +70,9 @@ public class DailyReportImpl implements DailyReportService {
 
          report = dailyReportRepository.save(report);
 
+        project.setProgress(dailyReport.getProgress().intValue());
+        project = projectRepository.save(project);
+
          if(Objects.nonNull(report.getReportId())) {
              implement=  implementRepository.save(implement);
              return true;
@@ -124,6 +129,14 @@ public class DailyReportImpl implements DailyReportService {
     @Override
     public List<DailyReport> getDailyReportsByUserImplement(String userDetails) {
         return dailyReportRepository.findByUerDetail(userDetails);
+    }
+
+    @Override
+    public DailyReport getByProjectId(String userId, Long projectId) {
+
+        Pageable pageable = PageRequest.of(0, 1);
+        return dailyReportRepository.findByProjectId(userId,projectId, pageable).stream().findFirst().orElse(null);
+
     }
 
 }

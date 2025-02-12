@@ -15,4 +15,5 @@ public interface DailyReportService {
 //    List<DailyReport> getDailyReportsByProjectId(Long projectId);
     List<DailyReport> getDailyReportsByUserImplement(String user);
 
+    DailyReport getByProjectId(String userId, Long projectId);
 }

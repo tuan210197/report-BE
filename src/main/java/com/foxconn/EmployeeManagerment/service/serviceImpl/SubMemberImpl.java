@@ -44,15 +44,14 @@ public class SubMemberImpl implements SubMemberService {
                 .projectName(subMember.getProjectName())
                 .build();
        savedSubMember=  subMemberRepository.save(savedSubMember);
-       this.sendSubMember(savedSubMember,"ADD NEW PROJECT");
+    //   this.sendSubMember(savedSubMember,"ADD NEW PROJECT");
         return Objects.nonNull(savedSubMember.getId());
     }
     public void sendSubMember(SubMember subMember, String subject) {
-  Users user = userRepository.findByUid(subMember.getUser());
-  log.info("email: "+user.getEmail());
-  String projectName = subMember.getProjectName();
-  Long id = subMember.getProjectId().getProjectId();
-
+          Users user = userRepository.findByUid(subMember.getUser());
+          log.info("email: "+user.getEmail());
+          String projectName = subMember.getProjectName();
+          Long id = subMember.getProjectId().getProjectId();
         mailSenderService.sendSimpleMessage(user.getEmail(), subject,
                 "Bạn Được Mời Vào Dự Án Mới" + "\n"
                         + "Tên Dự Án: "+ projectName + "\n"

@@ -2,10 +2,18 @@ package com.foxconn.EmployeeManagerment.controller;
 
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.dto.request.DailyReportDTO;
+import com.foxconn.EmployeeManagerment.dto.request.DateDTO;
 import com.foxconn.EmployeeManagerment.entity.DailyReport;
+import com.foxconn.EmployeeManagerment.entity.Project;
+import com.foxconn.EmployeeManagerment.projection.DailyReportProjection;
+import com.foxconn.EmployeeManagerment.repository.DailyReportRepository;
+import com.foxconn.EmployeeManagerment.repository.ProjectRepository;
 import com.foxconn.EmployeeManagerment.service.DailyReportService;
+import com.foxconn.EmployeeManagerment.service.ProjectService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,9 +28,15 @@ import java.util.List;
 public class DailyReportController extends  BaseController{
 
     private final DailyReportService dailyReportService;
+    private final ProjectService projectService;
+    private final ProjectRepository projectRepository;
+    private final DailyReportRepository dailyReportRepository;
 
-    public DailyReportController(DailyReportService dailyReportService) {
+    public DailyReportController(DailyReportService dailyReportService, ProjectService projectService, ProjectRepository projectRepository, DailyReportRepository dailyReportRepository) {
         this.dailyReportService = dailyReportService;
+        this.projectService = projectService;
+        this.projectRepository = projectRepository;
+        this.dailyReportRepository = dailyReportRepository;
     }
 
     @PostMapping("/add")
@@ -84,5 +98,25 @@ public class DailyReportController extends  BaseController{
             List<DailyReport> dailyReports = dailyReportService.getDailyReportsByUserImplement(uid);
             return ResponseEntity.ok(dailyReports);
         }
+    }
+
+    @PostMapping("/get-by-project")
+    public ResponseEntity<?> getDailyReportByProject(HttpServletRequest request, @RequestBody DailyReportDTO dailyReportDTO) {
+        String userId = this.getCurrentUser().getUid().trim();
+        DailyReport dailyReports = dailyReportService.getByProjectId(userId, dailyReportDTO.getProjectId());
+        Project project = projectRepository.findByProjectId(dailyReportDTO.getProjectId());
+        if (dailyReports != null && project != null) {
+            return toSuccessResult(dailyReports, "SUCCESS");
+        }if(dailyReports == null && project != null){
+            return toSuccessResult(project, "SUCCESS");
+        }
+        else {
+            return toExceptionResult("PROJECT NOT FOUND", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    }
+    @PostMapping("/export")
+    public ResponseEntity<?> exportDailyReport(HttpServletRequest request, @RequestBody DateDTO dto) {
+        return ResponseEntity.ok( dailyReportRepository.export(dto.getDate()));
+
     }
 }

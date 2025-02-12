@@ -22,7 +22,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query(value = "Select p from Project p where p.projectId = :projectId")
     Project findByProjectId(@Param( "projectId") Long projectId);
 
-    @Query(value = "SELECT p FROM Project p  ")
+    @Query(value = "SELECT p FROM Project p order by p.completed asc")
     List<Project> checkProjectByUserId(@Param("userId") String userId);
 
 

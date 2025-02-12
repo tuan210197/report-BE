@@ -20,6 +20,6 @@ public interface UserRepository extends JpaRepository<Users, String> {
     )
     List<Users> search(@Param("keyword") String keyword);
 
-    @Query("SELECT trim(u.uid) as uid, u.fullName as fullName FROM Users u")
-    List<UserProjection> getUser();
+    @Query("SELECT trim(u.uid) as uid, u.fullName as fullName FROM Users u where trim(u.uid) not in :uid")
+    List<UserProjection> getUser(@Param("uid") String uid);
 }

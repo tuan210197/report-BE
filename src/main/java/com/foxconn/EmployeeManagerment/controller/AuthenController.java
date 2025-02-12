@@ -424,7 +424,7 @@ public class AuthenController extends BaseController {
             // Tạo một cookie cùng tên với cookie chứa token, giá trị rỗng và thời gian sống = 0
             Cookie accessTokenCookie = new Cookie("token", null);
             accessTokenCookie.setHttpOnly(true); // Chỉ có server truy cập
-            accessTokenCookie.setSecure(true); // Yêu cầu HTTPS
+            accessTokenCookie.setSecure(false); // Yêu cầu HTTPS
             accessTokenCookie.setPath("/"); // Phạm vi hiệu lực của cookie
             accessTokenCookie.setMaxAge(0); // Xóa cookie ngay lập tức
             response.addCookie(accessTokenCookie); // Gửi cookie xóa về phía client

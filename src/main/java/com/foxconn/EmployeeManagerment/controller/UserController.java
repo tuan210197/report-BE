@@ -24,7 +24,8 @@ public class UserController extends BaseController {
 
     @GetMapping("/get-staff")
     public ResponseEntity<?> getStaff() {
-        List<UserProjection> users = userRepository.getUser();
+       String uid = this.getCurrentUser().getUid().trim();
+        List<UserProjection> users = userRepository.getUser(uid);
         return ResponseEntity.ok(users);
     }
     @GetMapping("/get-current")
