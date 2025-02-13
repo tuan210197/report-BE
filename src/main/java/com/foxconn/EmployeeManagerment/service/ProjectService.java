@@ -1,5 +1,6 @@
 package com.foxconn.EmployeeManagerment.service;
 
+import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
 import com.foxconn.EmployeeManagerment.dto.response.ChartDto;
@@ -36,7 +37,7 @@ public interface ProjectService {
 
     List<ProjectCompleted2> getCompleted2();
 
-    boolean updateStatus(ProjectDTO projectDTO);
+    boolean updateStatus(ProjectUpdateDTO projectDTO);
 
     List<Project>  search(String projectName);
 }

@@ -2,6 +2,7 @@ package com.foxconn.EmployeeManagerment.service.serviceImpl;
 
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.controller.BaseController;
+import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
 import com.foxconn.EmployeeManagerment.dto.response.ChartDto;
@@ -170,16 +171,21 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     }
 
     @Override
-    public boolean updateStatus(ProjectDTO projectDTO) {
+    public boolean updateStatus(ProjectUpdateDTO projectDTO) {
         Project project = projectRepository.findByProjectId(projectDTO.getProjectId());
         Assert.notNull(project, "PROJECT_NOT_FOUND");
-        Assert.isTrue(!projectDTO.getCompleted(), "PROJECT HAVE COMPLETED");
-        if(projectDTO.getCompleted()) {
-            project.setCompleted(false);
-            project.setProgress(99);
-        }else{
+
+
+        if(Objects.equals(projectDTO.getStatus(), "completed")) {
             project.setCompleted(true);
             project.setProgress(100);
+            project.setCanceled(false);
+        }if(Objects.equals(projectDTO.getStatus(), "remain")){
+            project.setCompleted(false);
+            project.setProgress(99);
+            project.setCanceled(false);
+        }if(Objects.equals(projectDTO.getStatus(), "canceled")){
+            project.setCanceled(true);
         }
 
         this.projectRepository.save(project);

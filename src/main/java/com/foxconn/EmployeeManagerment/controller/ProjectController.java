@@ -3,6 +3,7 @@ package com.foxconn.EmployeeManagerment.controller;
 
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
+import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.entity.Project;
 import com.foxconn.EmployeeManagerment.repository.ProjectRepository;
 import com.foxconn.EmployeeManagerment.service.ProjectService;
@@ -70,7 +71,8 @@ public class ProjectController extends BaseController {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
-    ;
+
+
 
     @GetMapping(value = "/get-all")
     public ResponseEntity<?> getAllProject(HttpServletRequest request) {
@@ -143,8 +145,8 @@ public class ProjectController extends BaseController {
         return ResponseEntity.ok(projectService.getProjectName());
     }
     @PostMapping("/update-status")
-    public ResponseEntity<?> updateStatus(HttpServletRequest request,@RequestBody  ProjectDTO projectDTO) {
-         if(projectService.updateStatus( projectDTO)){
+    public ResponseEntity<?> updateStatus(HttpServletRequest request,@RequestBody  ProjectUpdateDTO dto) {
+         if(projectService.updateStatus( dto)){
              return toSuccessResult(null, "UPDATE SUCCESS");
          } else {
              return toExceptionResult("UPDATE FALSE", Const.API_RESPONSE.RETURN_CODE_ERROR);

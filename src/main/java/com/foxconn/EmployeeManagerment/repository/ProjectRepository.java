@@ -46,9 +46,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT new com.foxconn.EmployeeManagerment.dto.response.ChartDto( " +
             "c.categoryName, " +
             "COUNT(p.projectId), " +
-            "SUM(CASE WHEN p.completed = true THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN p.completed = false and p.progress > 0 THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN p.completed = false and p.progress = 0 THEN 1 ELSE 0 END)) " +
+            "SUM(CASE WHEN p.completed = true and p.canceled = false  THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN p.completed = false and p.progress > 0 and p.canceled = false THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN p.canceled = true THEN 1 ELSE 0 END)) " +
             "FROM Category c " +
             "LEFT JOIN c.projects p " +
             "GROUP BY c.categoryId, c.categoryName " +
@@ -63,11 +63,12 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "FROM Project p " +
             "group by p.completed")
     List<ProjectCompleted> getCompleted();
+
     @Query( "select new com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2("
             +"COUNT(p) ,"+
-            "COUNT(CASE WHEN p.progress = 0 AND p.completed = false THEN 1 END) ," +
-            "COUNT(CASE WHEN p.progress > 0 AND p.progress < 100 AND p.completed = false THEN 1 END) ," +
-            "COUNT(CASE WHEN p.progress = 100 AND p.completed = true THEN 1 END))" + " FROM Project p")
+            "COUNT(CASE WHEN p.canceled = true THEN 1 END) ," +
+            "COUNT(CASE WHEN p.progress > 0 AND p.progress < 100 AND p.completed = false and p.canceled = false THEN 1 END) ," +
+            "COUNT(CASE WHEN p.progress = 100 AND p.completed = true and p.canceled = false  THEN 1 END))" + " FROM Project p")
     List<ProjectCompleted2> getCompleted2();
 
     @Query("SELECT p.projectId AS projectId, p.projectName AS projectName FROM Project p WHERE p.completed = FALSE ")
@@ -77,6 +78,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query("SELECT p FROM Project p " +
             "WHERE upper(COALESCE(p.projectName, '')) LIKE %:value% " +
             "OR upper(COALESCE(p.category.categoryName, '')) LIKE %:value% " +
-            "OR upper(COALESCE(p.pic.fullName, '')) LIKE %:value% order by p.projectId")
+            "OR upper(COALESCE(p.pic.fullName, '')) LIKE %:value% order by p.completed asc")
     List<Project> searchProject(@Param("value") String value);
 }
