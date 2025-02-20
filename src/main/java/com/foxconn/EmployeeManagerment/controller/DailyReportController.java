@@ -41,6 +41,7 @@ public class DailyReportController extends  BaseController{
 
     @PostMapping("/add")
     public ResponseEntity<?> createDailyReport(@RequestBody DailyReportDTO dailyReport) {
+
         String userId = this.getCurrentUser().getUid().trim();
 
         if(dailyReportService.createDailyReport(dailyReport,  userId)){
@@ -119,4 +120,21 @@ public class DailyReportController extends  BaseController{
         return ResponseEntity.ok( dailyReportRepository.export(dto.getDate()));
 
     }
+    @GetMapping("/get-max-export-date")
+    public ResponseEntity<?> exportDailyReport2(HttpServletRequest request) {
+        try{
+            String date = dailyReportRepository.getMaxDate();
+            if(date != null){
+                return toSuccessResult(date, "SUCCESS");
+            }else {
+                return toExceptionResult(null, Const.API_RESPONSE.RETURN_CODE_ERROR);
+            }
+        }
+        catch (IllegalArgumentException e) {
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+        } catch (Exception e) {
+            return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+        }
+    }
+
 }

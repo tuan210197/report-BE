@@ -6,6 +6,7 @@ import com.foxconn.EmployeeManagerment.dto.request.UserLoginDTO;
 import com.foxconn.EmployeeManagerment.dto.request.JwtRequest;
 import com.foxconn.EmployeeManagerment.dto.response.JwtResponse;
 
+import com.foxconn.EmployeeManagerment.entity.Users;
 import com.foxconn.EmployeeManagerment.security.JwtTokenUtil;
 import com.foxconn.EmployeeManagerment.service.JwtUserDetailsService;
 import io.jsonwebtoken.Claims;
@@ -20,6 +21,7 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -56,12 +58,17 @@ public class AuthenController extends BaseController {
     @RequestMapping(value = "/login", method = RequestMethod.POST)
     public ResponseEntity<?> createAuthenticationToken(HttpServletRequest request, @RequestBody JwtRequest authenticationRequest, HttpServletResponse response) {
 
+//        Users userLogin = userRepo.findByEmployeeCode(authenticationRequest.getEmployeeCode());
+        Users userLogin = Optional.ofNullable(userRepo.findByEmployeeCode(authenticationRequest.getEmployeeCode()))
+                .orElseThrow(() -> new UsernameNotFoundException("USERNAME NOT FOUND: " + authenticationRequest.getEmployeeCode() ));
+
+
         try {
             String requestId = request.getHeader("request-id");
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationRequest.getEmail(),
+            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userLogin.getEmail(),
                     authenticationRequest.getPassword()));
 
-            UserLoginDTO userLoginDTO = userDetailsService.getBasicAuthByEmail(authenticationRequest.getEmail(), true);
+            UserLoginDTO userLoginDTO = userDetailsService.getBasicAuthByEmail(userLogin.getEmail(), true);
 
             if (Objects.isNull(userLoginDTO)) {
                 return toExceptionResult("USER CHƯA XÁC THỰC, GỬI LẠI OTP", Const.API_RESPONSE.RETURN_CODE_ERROR);
@@ -430,7 +437,7 @@ public class AuthenController extends BaseController {
             response.addCookie(accessTokenCookie); // Gửi cookie xóa về phía client
 
             // Trả về phản hồi thành công
-            return ResponseEntity.ok("Logged out successfully");
+            return ResponseEntity.ok("oke");
         } catch (Exception e) {
             return ResponseEntity.status(500).body("Logout failed");
         }

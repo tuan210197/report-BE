@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -59,4 +60,10 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
         WHERE r.rn = 1 AND i.rn = 1
     """, nativeQuery = true)
     List<DailyReportProjection> export(@Param("date") String date);
+
+    @Query(value = "SELECT TO_CHAR(create_at, 'YYYY-MM-DD') AS formatted_date " +
+            "FROM emt.daily_report " +
+            "ORDER BY create_at DESC " +
+            "LIMIT 1", nativeQuery = true)
+    String getMaxDate();
 }
