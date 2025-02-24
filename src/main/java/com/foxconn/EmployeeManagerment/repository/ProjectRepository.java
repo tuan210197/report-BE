@@ -67,7 +67,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query( "select new com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2("
             +"COUNT(p) ,"+
             "COUNT(CASE WHEN p.canceled = true THEN 1 END) ," +
-            "COUNT(CASE WHEN p.progress > 0 AND p.progress < 100 AND p.completed = false and p.canceled = false THEN 1 END) ," +
+            "COUNT(CASE WHEN p.progress >= 0 AND p.progress < 100 AND p.completed = false and p.canceled = false THEN 1 END) ," +
             "COUNT(CASE WHEN p.progress = 100 AND p.completed = true and p.canceled = false  THEN 1 END))" + " FROM Project p")
     List<ProjectCompleted2> getCompleted2();
 
@@ -80,4 +80,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "OR upper(COALESCE(p.category.categoryName, '')) LIKE %:value% " +
             "OR upper(COALESCE(p.pic.fullName, '')) LIKE %:value% order by p.completed asc")
     List<Project> searchProject(@Param("value") String value);
+
+    @Query("SELECT p FROM Project p WHERE UPPER(COALESCE(p.projectName, '')) LIKE UPPER(CONCAT('%', :projectName, '%'))")
+    List<Project> findByName(@Param("projectName") String projectName);
+
 }

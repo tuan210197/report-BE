@@ -40,4 +40,6 @@ public interface ProjectService {
     boolean updateStatus(ProjectUpdateDTO projectDTO);
 
     List<Project>  search(String projectName);
+
+    List<Project> getProjectByName(String projectName);
 }

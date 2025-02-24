@@ -33,4 +33,11 @@ public class UserController extends BaseController {
         String uid = this.getCurrentUser().getUid().trim();
         return ResponseEntity.ok(userRepository.findByUid(uid));
 }
+    @GetMapping("/get-all")
+    public ResponseEntity<?> getAllUsers() {
+
+        String uid = this.getCurrentUser().getUid().trim();
+        List<UserProjection> users = userRepository.getAllUser();
+        return ResponseEntity.ok(users);
+    }
 }

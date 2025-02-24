@@ -42,14 +42,24 @@ public class SecurityConfig implements WebMvcConfigurer {
 
 
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("http://localhost:4200/")
-                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
-                .allowedHeaders("*")  // Cho phép tất cả các headers
-                .allowCredentials(true);
-    }
+//    @Override
+//    public void addCorsMappings(CorsRegistry registry) {
+//        registry.addMapping("/**")
+//                .allowedOrigins("http://localhost:4200/")
+
+//                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+//                .allowedHeaders("*")  // Cho phép tất cả các headers
+//                .allowCredentials(true);
+//    }
+@Override
+public void addCorsMappings(CorsRegistry registry) {
+    registry.addMapping("/**")
+            .allowedOriginPatterns("http://localhost:4200") // Chỉ định rõ nguồn gốc
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true);
+}
+
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {

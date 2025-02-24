@@ -25,4 +25,7 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query("SELECT u FROM Users u where u.employeeCode = :employeeCode ")
     Users findByEmployeeCode(@Param("employeeCode") String employeeCode);
+
+    @Query("SELECT trim(u.uid) as uid, u.fullName as fullName FROM Users u ")
+    List<UserProjection> getAllUser();
 }

@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CollectionId;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,55 +39,55 @@ public class Project {
     private LocalDateTime createAt;
 
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @Column(name = "progress" )
     private int progress;
 
     @Column(name = "start_receive_request")
-    private LocalDateTime startReceiveRequest;
+    private LocalDate startReceiveRequest;
 
     @Column(name = "end_receive_request")
-    private LocalDateTime endReceiveRequest;
+    private LocalDate endReceiveRequest;
 
     @Column(name = "start_estimate")
-    private LocalDateTime startEstimate;
+    private LocalDate startEstimate;
 
     @Column(name = "end_estimate")
-    private LocalDateTime endEstimate;
+    private LocalDate endEstimate;
 
     @Column(name = "start_request_purchase")
-    private LocalDateTime startRequestPurchase;
+    private LocalDate startRequestPurchase;
 
     @Column(name = "end_request_purchase")
-    private LocalDateTime endRequestPurchase;
+    private LocalDate endRequestPurchase;
 
     @Column(name = "start_quotation")
-    private LocalDateTime startQuotation;
+    private LocalDate startQuotation;
 
     @Column(name = "end_quotation")
-    private LocalDateTime endQuotation;
+    private LocalDate endQuotation;
 
     @Column(name = "start_submit_budget")
-    private LocalDateTime startSubmitBudget;
+    private LocalDate startSubmitBudget;
 
     @Column(name = "end_submit_budget")
-    private LocalDateTime endSubmitBudget;
+    private LocalDate endSubmitBudget;
 
     @Column(name = "start_pr")
-    private LocalDateTime startPR;
+    private LocalDate startPR;
 
     @Column(name = "end_pr")
-    private LocalDateTime endPR;
+    private LocalDate endPR;
 
     @Column(name = "start_po")
-    private LocalDateTime startPO;
+    private LocalDate startPO;
 
     @Column(name = "end_po")
-    private LocalDateTime endPO;
+    private LocalDate endPO;
 
     @Column(name = "completed")
     private Boolean completed;
@@ -107,6 +108,10 @@ public class Project {
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DailyReport> dailyReports;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileUpload> project;
+
 //    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "pic")
@@ -115,4 +120,7 @@ public class Project {
     @JsonIgnore
     @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubMember> subMembers;
+
+
+
 }

@@ -152,9 +152,15 @@ public class ProjectController extends BaseController {
              return toExceptionResult("UPDATE FALSE", Const.API_RESPONSE.RETURN_CODE_ERROR);
          }
          }
-
-         @PostMapping("/search")
+    @PostMapping("/search")
     public ResponseEntity<?> search(HttpServletRequest request,@RequestBody  ProjectDTO projectDTO) {
         return ResponseEntity.ok(projectService.search(projectDTO.getProjectName()));
-         }
-}
+          }
+
+    @PostMapping("search-by-name")
+    public ResponseEntity<?> searchByName(HttpServletRequest request,@RequestBody  ProjectDTO projectDTO) {
+        List<Project> projects  = projectService.getProjectByName(projectDTO.getProjectName());
+        return toSuccessResult(projects, "SUCCESS");
+
+    }
+ }

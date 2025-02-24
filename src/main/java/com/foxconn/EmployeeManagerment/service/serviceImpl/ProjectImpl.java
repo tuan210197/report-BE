@@ -22,9 +22,12 @@ import com.foxconn.EmployeeManagerment.service.ProjectService;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,7 +74,7 @@ public class ProjectImpl extends BaseController implements  ProjectService {
                 .description(projectDto.getDescription())
                 .pic(user)
                 .createAt(LocalDateTime.now())
-                .endPO(LocalDateTime.now())
+                .endPO(LocalDate.now())
                 .category(category)
                 .completed(false)
                 .startDate(projectDto.getStartDate())
@@ -91,6 +94,7 @@ public class ProjectImpl extends BaseController implements  ProjectService {
                 .endPO(projectDto.getEndPO())
                 .endDate(projectDto.getEndDate())
                 .progress(0)
+                .canceled(false)
                 .build();
         project = projectRepository.save(project);
 
@@ -98,8 +102,10 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     }
 
     @Override
+    @Transactional
     public Boolean updateProject(String userId, ProjectDTO project) {
 
+        Users user = userRepository.findByUid(project.getPic());
         Project projectCheck = projectRepository.findByProjectId(project.getProjectId());
         Assert.notNull(projectCheck, "PROJECT_NOT_FOUND");
 
@@ -121,7 +127,9 @@ public class ProjectImpl extends BaseController implements  ProjectService {
         projectCheck.setEndQuotation(project.getEndQuotation());
         projectCheck.setEndSubmitBudget(project.getEndSubmitBudget());
 
-        projectCheck = projectRepository.save(projectCheck);
+        projectCheck.setPic(user);
+
+         projectRepository.save(projectCheck);
 
         return true;
     }
@@ -196,6 +204,13 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     @Override
     public List<Project> search(String value) {
         return projectRepository.searchProject(value);
+    }
+
+    @Override
+    public List<Project> getProjectByName(String projectName) {
+
+        return projectRepository.findByName(projectName);
+
     }
 
 

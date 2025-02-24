@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -28,39 +29,39 @@ public class ProjectDTO {
 
     private LocalDateTime createAt;
 
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     private int progress;
 
-    private LocalDateTime startReceiveRequest;
+    private LocalDate startReceiveRequest;
 
-    private LocalDateTime endReceiveRequest;
+    private LocalDate endReceiveRequest;
 
-    private LocalDateTime startEstimate;
+    private LocalDate startEstimate;
 
-    private LocalDateTime endEstimate;
+    private LocalDate endEstimate;
 
-    private LocalDateTime startRequestPurchase;
+    private LocalDate startRequestPurchase;
 
-    private LocalDateTime endRequestPurchase;
+    private LocalDate endRequestPurchase;
 
-    private LocalDateTime startQuotation;
+    private LocalDate startQuotation;
 
-    private LocalDateTime endQuotation;
+    private LocalDate endQuotation;
 
-    private LocalDateTime startSubmitBudget;
+    private LocalDate startSubmitBudget;
 
-    private LocalDateTime endSubmitBudget;
+    private LocalDate endSubmitBudget;
 
-    private LocalDateTime startPR;
+    private LocalDate startPR;
 
-    private LocalDateTime endPR;
+    private LocalDate endPR;
 
-    private LocalDateTime startPO;
+    private LocalDate startPO;
 
-    private LocalDateTime endPO;
+    private LocalDate endPO;
 
     private Boolean completed;
 

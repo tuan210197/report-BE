@@ -95,4 +95,8 @@ public class Users {
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Implement> userImplements;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "userUploads", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FileUpload> userUploads;
+
 }
