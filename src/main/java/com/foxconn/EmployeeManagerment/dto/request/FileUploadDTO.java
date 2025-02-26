@@ -12,6 +12,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FileUploadDTO {
-private Long projectId;
-private String uid;
+    private Long projectId;
+    private String uid;
 }

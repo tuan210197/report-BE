@@ -1,6 +1,5 @@
 package com.foxconn.EmployeeManagerment.service.serviceImpl;
 
-import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.controller.BaseController;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
@@ -8,15 +7,9 @@ import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
 import com.foxconn.EmployeeManagerment.dto.response.ChartDto;
 import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted;
 import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2;
-import com.foxconn.EmployeeManagerment.entity.BasicLogin;
-import com.foxconn.EmployeeManagerment.entity.Category;
-import com.foxconn.EmployeeManagerment.entity.Project;
-import com.foxconn.EmployeeManagerment.entity.Users;
+import com.foxconn.EmployeeManagerment.entity.*;
 import com.foxconn.EmployeeManagerment.projection.ProjectProjection;
-import com.foxconn.EmployeeManagerment.repository.CateRepository;
-import com.foxconn.EmployeeManagerment.repository.ProjectRepository;
-import com.foxconn.EmployeeManagerment.repository.SubMemberRepository;
-import com.foxconn.EmployeeManagerment.repository.UserRepository;
+import com.foxconn.EmployeeManagerment.repository.*;
 import com.foxconn.EmployeeManagerment.service.MailSenderService;
 import com.foxconn.EmployeeManagerment.service.ProjectService;
 
@@ -27,14 +20,13 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Service
-public class ProjectImpl extends BaseController implements  ProjectService {
+public class ProjectImpl extends BaseController implements ProjectService {
+    private final CategoryRepository categoryRepository;
 
 
     private final ProjectRepository projectRepository;
@@ -43,12 +35,14 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     private final UserRepository userRepository;
     private final MailSenderService mailSenderService;
 
-    public ProjectImpl(ProjectRepository projectRepository, SubMemberRepository subMemberRepository, CateRepository cateRepository, UserRepository userRepository, MailSenderService mailSenderService) {
+    public ProjectImpl(ProjectRepository projectRepository, SubMemberRepository subMemberRepository, CateRepository cateRepository, UserRepository userRepository, MailSenderService mailSenderService,
+                       CategoryRepository categoryRepository) {
         this.projectRepository = projectRepository;
         this.subMemberRepository = subMemberRepository;
         this.cateRepository = cateRepository;
         this.userRepository = userRepository;
         this.mailSenderService = mailSenderService;
+        this.categoryRepository = categoryRepository;
     }
 
 
@@ -63,9 +57,9 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     }
 
     @Override
-    public Long  createProject(ProjectDTO projectDto, String userId) throws Exception {
+    public Long createProject(ProjectDTO projectDto, String userId) throws Exception {
         Users user = userRepository.findByUid(userId);
-        Category category =  cateRepository.getOneCategory(projectDto.getCategoryId());
+        Category category = cateRepository.getOneCategory(projectDto.getCategoryId());
         Assert.notNull(category, "CATEGORY_NOT_FOUND");
         Assert.notNull(user, "USER NOT FOUND");
 
@@ -129,7 +123,7 @@ public class ProjectImpl extends BaseController implements  ProjectService {
 
         projectCheck.setPic(user);
 
-         projectRepository.save(projectCheck);
+        projectRepository.save(projectCheck);
 
         return true;
     }
@@ -138,6 +132,7 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     public List<Project> getAllProject() {
         return projectRepository.findAll();
     }
+
     @Override
     public List<Project> findProjectByUserId(String uid) {
 
@@ -184,15 +179,17 @@ public class ProjectImpl extends BaseController implements  ProjectService {
         Assert.notNull(project, "PROJECT_NOT_FOUND");
 
 
-        if(Objects.equals(projectDTO.getStatus(), "completed")) {
+        if (Objects.equals(projectDTO.getStatus(), "completed")) {
             project.setCompleted(true);
             project.setProgress(100);
             project.setCanceled(false);
-        }if(Objects.equals(projectDTO.getStatus(), "remain")){
+        }
+        if (Objects.equals(projectDTO.getStatus(), "remain")) {
             project.setCompleted(false);
             project.setProgress(99);
             project.setCanceled(false);
-        }if(Objects.equals(projectDTO.getStatus(), "canceled")){
+        }
+        if (Objects.equals(projectDTO.getStatus(), "canceled")) {
             project.setCanceled(true);
         }
 
@@ -210,6 +207,17 @@ public class ProjectImpl extends BaseController implements  ProjectService {
     public List<Project> getProjectByName(String projectName) {
 
         return projectRepository.findByName(projectName);
+
+    }
+
+    @Override
+    public List<Project> searchChart(ProjectDTO projectDTO) {
+        Category category = categoryRepository.findByCategoryName(projectDTO.getCategoryName());
+        Assert.notNull(category, "CATEGORY_NOT_FOUND");
+        String categoryId = category.getCategoryId();
+        Boolean completed = projectDTO.getCompleted();
+        Boolean cancelled = projectDTO.getCancelled();
+        return projectRepository.getByChart(categoryId, completed, cancelled);
 
     }
 

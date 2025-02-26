@@ -14,18 +14,18 @@ import java.util.List;
 public interface ProjectService {
 
     Project getProjectByUser(String userId);
+
     Project getAllproject();
-    Long createProject(ProjectDTO project, String userId) throws  Exception;
+
+    Long createProject(ProjectDTO project, String userId) throws Exception;
+
     Boolean updateProject(String userId, ProjectDTO project);
 
     List<Project> getAllProject();
 
-
     List<Project> findProjectByUserId(String uid);
 
-
     Boolean checkOwnerProject(String uid, Long projectId);
-
 
     List<ChartDto> getDashboard();
 
@@ -39,7 +39,9 @@ public interface ProjectService {
 
     boolean updateStatus(ProjectUpdateDTO projectDTO);
 
-    List<Project>  search(String projectName);
+    List<Project> search(String projectName);
 
     List<Project> getProjectByName(String projectName);
+
+    List<Project> searchChart(ProjectDTO projectDTO);
 }

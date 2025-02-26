@@ -19,7 +19,6 @@ import java.util.*;
 @Slf4j
 @RestController
 @RequestMapping("/api/files")
-@CrossOrigin(origins = "http://localhost:4200")
 public class FileController extends BaseController {
 
 

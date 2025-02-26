@@ -47,7 +47,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "c.categoryName, " +
             "COUNT(p.projectId), " +
             "SUM(CASE WHEN p.completed = true and p.canceled = false  THEN 1 ELSE 0 END), " +
-            "SUM(CASE WHEN p.completed = false and p.progress > 0 and p.canceled = false THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN p.completed = false and p.progress >= 0 and p.canceled = false THEN 1 ELSE 0 END), " +
             "SUM(CASE WHEN p.canceled = true THEN 1 ELSE 0 END)) " +
             "FROM Category c " +
             "LEFT JOIN c.projects p " +
@@ -83,5 +83,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
 
     @Query("SELECT p FROM Project p WHERE UPPER(COALESCE(p.projectName, '')) LIKE UPPER(CONCAT('%', :projectName, '%'))")
     List<Project> findByName(@Param("projectName") String projectName);
+//
+//    @Query("SELECT p FROM Project p where UPPER(COALESCE(p.category, '')) = UPPER(:projectName) and p.completed =:completed and p.canceled =:cancelled")
+//    List<Project> getByChart(@Param("categoryName") String categoryName,@Param("completed") Boolean completed,@Param("cancelled") Boolean cancelled);
+
+    @Query("SELECT p FROM Project p WHERE  p.category.categoryId = :categoryId AND p.completed = :completed AND p.canceled = :canceled")
+    List<Project> getByChart(@Param("categoryId") String categoryId, @Param("completed") Boolean completed, @Param("canceled") Boolean canceled);
 
 }

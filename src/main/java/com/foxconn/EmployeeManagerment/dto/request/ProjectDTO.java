@@ -65,29 +65,6 @@ public class ProjectDTO {
 
     private Boolean completed;
 
-//    public static ProjectDTO projectResponseDto (Project project){
-//        ProjectDTO projectDTO = new ProjectDTO();
-//        projectDTO.setProjectId(project.getProjectId());
-//        projectDTO.setProjectName(project.getProjectName());
-//        projectDTO.setCompleted(project.getCompleted());
-//        projectDTO.setDescription(project.getDescription());
-//        projectDTO.setStartDate(project.getStartDate());
-//        projectDTO.setStartPO(project.getStartPO());
-//        projectDTO.setStartEstimate(project.getStartEstimate());
-//        projectDTO.setStartPR(project.getStartPR());
-//        projectDTO.setStartQuotation(project.getStartQuotation());
-//        projectDTO.setStartReceiveRequest(project.getStartReceiveRequest());
-//        projectDTO.setStartRequestPurchase(project.getStartRequestPurchase());
-//        projectDTO.setStartSubmitBudget(project.getStartSubmitBudget());
-//        projectDTO.setEndDate(project.getEndDate());
-//        projectDTO.setEndPO(project.getEndPO());
-//        projectDTO.setEndEstimate(project.getEndEstimate());
-//        projectDTO.setEndPR(project.getEndPR());
-//        projectDTO.setEndReceiveRequest(project.getEndReceiveRequest());
-//        projectDTO.setEndRequestPurchase(project.getEndRequestPurchase());
-//        projectDTO.setEndQuotation(project.getEndQuotation());
-//        projectDTO.setCategoryId(projectDTO.getCategoryId());
-//
-//        return projectDTO;
-//    }
+    private Boolean cancelled;
+
 }

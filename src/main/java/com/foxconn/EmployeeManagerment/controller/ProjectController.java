@@ -59,7 +59,7 @@ public class ProjectController extends BaseController {
     @PostMapping(value = "/update")
     public ResponseEntity<?> updateProject(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {
         try {
-            String uid  = this.getCurrentUser().getUid().trim();
+            String uid = this.getCurrentUser().getUid().trim();
             if (projectService.updateProject(uid, projectDTO)) {
                 return toSuccessResult(null, "UPDATE PROJECT SUCCESS");
             } else {
@@ -73,29 +73,30 @@ public class ProjectController extends BaseController {
     }
 
 
-
     @GetMapping(value = "/get-all")
     public ResponseEntity<?> getAllProject(HttpServletRequest request) {
         UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))) {
-           List<Project> projects =  projectService.getAllProject();
-            return  toSuccessResult(projects, "SUCCESS");
+            List<Project> projects = projectService.getAllProject();
+            return toSuccessResult(projects, "SUCCESS");
         } else {
             return toExceptionResult("NO PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
         }
     }
-// get all project by user id
+
+    // get all project by user id
     @GetMapping(value = "/get-by-userid")
-    public ResponseEntity<?> getByUserId(HttpServletRequest request){
+    public ResponseEntity<?> getByUserId(HttpServletRequest request) {
         String uid = this.getCurrentUser().getUid().trim();
         log.info(uid);
-        List<Project> projects =  projectService.findProjectByUserId(uid);
+        List<Project> projects = projectService.findProjectByUserId(uid);
         return ResponseEntity.ok(projects);
 
     }
-// get project by projectId
+
+    // get project by projectId
     @GetMapping(value = "/{projectId}")
-    public ResponseEntity<?> getProjectById( HttpServletRequest request,@PathVariable Long projectId) {
+    public ResponseEntity<?> getProjectById(HttpServletRequest request, @PathVariable Long projectId) {
         Project project = projectRepository.findByProjectId(projectId);
         if (project != null) {
             return toSuccessResult(project, "SUCCESS");
@@ -105,62 +106,76 @@ public class ProjectController extends BaseController {
     }
 
     @GetMapping(value = "/check-project/{projectId}")
-    public ResponseEntity<?> checkOwnerProject (HttpServletRequest request, @PathVariable Long projectId){
+    public ResponseEntity<?> checkOwnerProject(HttpServletRequest request, @PathVariable Long projectId) {
         String uid = this.getCurrentUser().getUid().trim();
-        if(projectService.checkOwnerProject(uid, projectId)){
+        if (projectService.checkOwnerProject(uid, projectId)) {
             return toSuccessResult(null, "HAVE PERMISSION");
         } else {
             return toExceptionResult("NO PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
 
-}
+    }
 
     @GetMapping(value = "/dashboard")
-    public ResponseEntity<?> getDashboard(HttpServletRequest request){
+    public ResponseEntity<?> getDashboard(HttpServletRequest request) {
 
         UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))) {
-            return ResponseEntity.ok(projectService.getDashboard());
+        return ResponseEntity.ok(projectService.getDashboard());
 //        }
 //        else {
 //            return toExceptionResult("NO PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR);
 //        }
     }
+
     @GetMapping("/get-total")
-    public ResponseEntity<?> getTotal(HttpServletRequest request){
+    public ResponseEntity<?> getTotal(HttpServletRequest request) {
         return ResponseEntity.ok(projectService.getTotal());
     }
 
     @GetMapping("/get-completed")
-    public ResponseEntity<?> getCompleted(HttpServletRequest request){
-        return  ResponseEntity.ok(projectService.getCompleted());
+    public ResponseEntity<?> getCompleted(HttpServletRequest request) {
+        return ResponseEntity.ok(projectService.getCompleted());
     }
 
     @GetMapping("/get-completed2")
-    public ResponseEntity<?> getCompleted2(HttpServletRequest request){
-        return  ResponseEntity.ok(projectService.getCompleted2());
+    public ResponseEntity<?> getCompleted2(HttpServletRequest request) {
+        return ResponseEntity.ok(projectService.getCompleted2());
     }
+
     @GetMapping("/get-project-name")
-    public ResponseEntity<?> getProjectName(HttpServletRequest request){
+    public ResponseEntity<?> getProjectName(HttpServletRequest request) {
         return ResponseEntity.ok(projectService.getProjectName());
     }
-    @PostMapping("/update-status")
-    public ResponseEntity<?> updateStatus(HttpServletRequest request,@RequestBody  ProjectUpdateDTO dto) {
-         if(projectService.updateStatus( dto)){
-             return toSuccessResult(null, "UPDATE SUCCESS");
-         } else {
-             return toExceptionResult("UPDATE FALSE", Const.API_RESPONSE.RETURN_CODE_ERROR);
-         }
-         }
-    @PostMapping("/search")
-    public ResponseEntity<?> search(HttpServletRequest request,@RequestBody  ProjectDTO projectDTO) {
-        return ResponseEntity.ok(projectService.search(projectDTO.getProjectName()));
-          }
 
-    @PostMapping("search-by-name")
-    public ResponseEntity<?> searchByName(HttpServletRequest request,@RequestBody  ProjectDTO projectDTO) {
-        List<Project> projects  = projectService.getProjectByName(projectDTO.getProjectName());
+    @PostMapping("/update-status")
+    public ResponseEntity<?> updateStatus(HttpServletRequest request, @RequestBody ProjectUpdateDTO dto) {
+        if (projectService.updateStatus(dto)) {
+            return toSuccessResult(null, "UPDATE SUCCESS");
+        } else {
+            return toExceptionResult("UPDATE FALSE", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<?> search(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {
+        return ResponseEntity.ok(projectService.search(projectDTO.getProjectName()));
+    }
+
+    @PostMapping("/search-chart")
+    public ResponseEntity<?> searchChart(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {
+        List<Project> projects = projectService.searchChart(projectDTO);
+        if(!projects.isEmpty()) {
+            return toSuccessResult(projects, "SUCCESS");
+        } else {
+            return toExceptionResult("NO DATA", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    }
+
+    @PostMapping("/search-by-name")
+    public ResponseEntity<?> searchByName(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {
+        List<Project> projects = projectService.getProjectByName(projectDTO.getProjectName());
         return toSuccessResult(projects, "SUCCESS");
 
     }
- }
+}

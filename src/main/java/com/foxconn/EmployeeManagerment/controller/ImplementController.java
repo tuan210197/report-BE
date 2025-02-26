@@ -15,8 +15,7 @@ import java.util.List;
 @RequestMapping("/api/implement")
 @CrossOrigin
 @Slf4j
-public class ImplementController extends  BaseController{
-
+public class ImplementController extends BaseController {
 
     private final ImplementService implementService;
 
@@ -27,10 +26,9 @@ public class ImplementController extends  BaseController{
     @PostMapping("/add")
     public ResponseEntity<?> createImplement(@RequestBody ImplementDto implement) {
         String uid = this.getCurrentUser().getUid().trim();
-        if( implementService.createImplement(implement, uid))
-        {
-            return  toSuccessResult(null, "Add Success");
-        }else {
+        if (implementService.createImplement(implement, uid)) {
+            return toSuccessResult(null, "Add Success");
+        } else {
             return toExceptionResult("Add Fail", Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
     }
@@ -65,10 +63,5 @@ public class ImplementController extends  BaseController{
         return ResponseEntity.ok(implementsList);
     }
 
-//    @GetMapping("/get-by-project/{projectId}")
-//    public ResponseEntity<List<Implement>> getImplementsByProjectId(@PathVariable Long projectId) {
-//        List<Implement> implementsList = implementService.getImplementsByProjectId(projectId);
-//        return ResponseEntity.ok(implementsList);
-//    }
 
 }

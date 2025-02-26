@@ -54,57 +54,55 @@ public class FileUploadServiceImpl implements FileUploadService {
     public boolean uploadFile(MultipartFile file, String uid, Long projectId) {
 
         FileUpload fileUpload = fileRepository.findByFileName(file.getOriginalFilename());
-        Project project = projectRepository.findById(projectId).orElseThrow( () -> new RuntimeException("Project not found"));
-        if(Objects.isNull(fileUpload)){
-        try {
-            Users userUpload = userRepository.findByUid(uid);
-            Path filePath = Paths.get(uploadDir).resolve(Objects.requireNonNull(file.getOriginalFilename())).normalize();
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        if (Objects.isNull(fileUpload)) {
+            try {
+                Users userUpload = userRepository.findByUid(uid);
+                Path filePath = Paths.get(uploadDir).resolve(Objects.requireNonNull(file.getOriginalFilename())).normalize();
 
 
+                Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+                FileUpload fileEntity = FileUpload.builder()
+                        .fileName(file.getOriginalFilename())
+                        .fileSize(file.getSize())
+                        .filePath(filePath.toString())
+                        .uploadTime(LocalDateTime.now())
+                        .projectId(project)
+                        .userUploads(userUpload)
+                        .build();
 
-
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-            FileUpload fileEntity = FileUpload.builder()
-                    .fileName(file.getOriginalFilename())
-                    .fileSize(file.getSize())
-                    .filePath(filePath.toString())
-                    .uploadTime(LocalDateTime.now())
-                    .projectId(project)
-                    .userUploads(userUpload)
-                    .build();
-
-            fileRepository.save(fileEntity);
-            return true;
-        }catch (IOException e) {
-            throw new RuntimeException("CAN NOT SAVE FILE: " + e.getMessage(), e);
-        }
-        }else {
+                fileRepository.save(fileEntity);
+                return true;
+            } catch (IOException e) {
+                throw new RuntimeException("CAN NOT SAVE FILE: " + e.getMessage(), e);
+            }
+        } else {
             return false;
         }
     }
 
     @Override
     public ResponseEntity<Resource> downloadFile(String fileName) {
-            try {
-                Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
-                Resource resource = new UrlResource(filePath.toUri());
+        try {
+            Path filePath = Paths.get(uploadDir).resolve(fileName).normalize();
+            Resource resource = new UrlResource(filePath.toUri());
 
-                if (!resource.exists() || !resource.isReadable()) {
-                    return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-                }
-                // Xác định kiểu MIME của file
-                String contentType = Files.probeContentType(filePath);
-                if (contentType == null) {
-                    contentType = "application/octet-stream"; // Kiểu mặc định nếu không xác định được
-                }
-
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType)) // Set kiểu file đúng
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"") // Bắt buộc tải về
-                        .body(resource);
-
-            } catch (IOException e) {
-                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+            if (!resource.exists() || !resource.isReadable()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
             }
+            // Xác định kiểu MIME của file
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = "application/octet-stream"; // Kiểu mặc định nếu không xác định được
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType)) // Set kiểu file đúng
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileName + "\"") // Bắt buộc tải về
+                    .body(resource);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
     }
 }

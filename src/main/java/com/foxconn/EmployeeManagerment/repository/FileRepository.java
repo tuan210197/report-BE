@@ -9,5 +9,5 @@ import java.util.Optional;
 
 public interface FileRepository extends JpaRepository<FileUpload, Long> {
     @Query("SELECT f FROM FileUpload f where f.fileName =:originalFilename")
-    FileUpload findByFileName(@Param("originalFilename")String originalFilename);
+    FileUpload findByFileName(@Param("originalFilename") String originalFilename);
 }
