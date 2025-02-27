@@ -12,5 +12,7 @@ public interface ImplementService {
     List<Implement> getImplementById(Long id);
     List<Implement> getAllImplements();
     List<Implement> getImplementsByUserImplement(String userImplement);
+
+    List<String> getImplementByProject(Long projectId);
 //    List<Implement> getImplementsByProjectId(Long projectId);
 }

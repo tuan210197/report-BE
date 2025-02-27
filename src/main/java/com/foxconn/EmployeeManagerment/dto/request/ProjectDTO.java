@@ -67,4 +67,9 @@ public class ProjectDTO {
 
     private Boolean cancelled;
 
+    private Boolean isDeleted;
+
+    private int year;
+
+
 }

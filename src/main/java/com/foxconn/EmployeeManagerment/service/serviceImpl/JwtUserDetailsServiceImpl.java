@@ -113,7 +113,6 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
     }
 
 
-
     @Override
     public boolean banUser(UserLoginDTO userLoginDTO) {
 
@@ -160,7 +159,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
 
     @Override
-    public boolean registerUser(UserLoginDTO user)  {
+    public boolean registerUser(UserLoginDTO user) {
         Assert.hasText(user.getEmail(), "EMAIL_EMPTY");
         Assert.isTrue(ValidateUtil.regexValidation(user.getEmail(), Const.VALIDATE_INPUT.regexEmail), "EMAIL_WRONG_FORMAT");
         BasicLogin checkBasicLogin = basicLoginRepo.findByEmail(user.getEmail());
@@ -171,7 +170,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
                 .orElseThrow(() -> new RuntimeException("Department not found"));
 
         Role role = roleRepository.search(user.getRoles());
-
+        boolean isReport = user.getRoles() != 1;
         Users users = Users.builder()
                 .avatar(user.getAvatar())
                 .birthday(user.getBirthday())
@@ -184,6 +183,8 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
                 .department(department)
                 .email(user.getEmail())
                 .employeeCode(user.getEmployeeCode())
+                .isReport(isReport)
+                .isReceive(!isReport)
                 .build();
 
         users = userRepo.save(users);
@@ -228,7 +229,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(15));
         basicLogin.setRetryCount(0);
         basicLoginRepo.save(basicLogin);
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Reset Password is: " + otpToken );
+        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Reset Password is: " + otpToken);
     }
 
     public void sendPassword(BasicLogin basicLogin, String subject) {
@@ -282,6 +283,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
 
     //Update profile user
     @Override
+    @Transactional
     public boolean updateUser(String userId, UserLoginDTO userLoginDTO) {
         Users userCheck = userRepo.findByUid(userId);
         Assert.notNull(userCheck, "USER_NOT_FOUND");

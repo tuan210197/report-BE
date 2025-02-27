@@ -63,5 +63,14 @@ public class ImplementController extends BaseController {
         return ResponseEntity.ok(implementsList);
     }
 
+    @PostMapping("/get-implement-by-project")
+    public ResponseEntity<?> getImplementsByProject(@RequestBody Long projectId) {
+        List<String> implement = implementService.getImplementByProject(projectId);
+        if (implement != null) {
+            return toSuccessResult(implement, "SUCCESS");
+        } else {
+            return toExceptionResult("No implementation found", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    }
 
 }

@@ -5,18 +5,19 @@ import com.foxconn.EmployeeManagerment.entity.*;
 import com.foxconn.EmployeeManagerment.repository.*;
 import com.foxconn.EmployeeManagerment.service.DailyReportService;
 import io.jsonwebtoken.lang.Assert;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
+@Slf4j
 @Service
 public class DailyReportImpl implements DailyReportService {
 
@@ -36,74 +37,88 @@ public class DailyReportImpl implements DailyReportService {
 
 
     @Override
+    @Transactional
     public boolean createDailyReport(DailyReportDTO dailyReport, String userId) {
 
+        LocalDate today = LocalDate.now();
+        LocalDateTime startOfDay = today.atStartOfDay(); // 00:00:00
+        LocalDateTime endOfDay = today.atTime(23, 59, 59); // 23:59:59
         Project project = projectRepository.findByProjectId(dailyReport.getProjectId());
         Category category = cateRepository.findByCategory(dailyReport.getCategoryId());
-        Users users =userRepository.findByUid(userId);
-        Assert.notNull(project,"PROJECT NOT FOUND");
-        Assert.notNull(category,"CATEGORY NOT FOUND");
+        Users users = userRepository.findByUid(userId);
+        Assert.notNull(project, "PROJECT NOT FOUND");
+        Assert.notNull(category, "CATEGORY NOT FOUND");
 
-        DailyReport report = DailyReport.builder()
-          .create_at(LocalDateTime.now())
-          .endDate(dailyReport.getEndDate())
-          .startDate(dailyReport.getStartDate())
-          .progress(dailyReport.getProgress())
-          .address(dailyReport.getAddress())
-          .reporterId(userId)
-          .category(category)
-          .contractor(dailyReport.getContractor())
-          .numberWorker(dailyReport.getNumberWorker())
-          .quantity(dailyReport.getQuantity())
-          .quantityCompleted(dailyReport.getQuantityCompleted())
-          .quantityRemain(dailyReport.getQuantityRemain())
-          .requester(dailyReport.getRequester())
-          .project(project)
-          .build();
 
-        Implement implement = Implement.builder()
-                .createAt(LocalDateTime.now())
-                .implement(dailyReport.getImplement())
-                .users(users)
-                .projects(project)
-                .build();
+        List<DailyReport> check = dailyReportRepository.checkDailyReport(dailyReport.getProjectId(), userId, startOfDay, endOfDay);
+        if (check.isEmpty()) {
+            log.info("empty daily report");
+            DailyReport report = DailyReport.builder()
+                    .create_at(LocalDateTime.now())
+                    .endDate(dailyReport.getEndDate())
+                    .startDate(dailyReport.getStartDate())
+                    .progress(dailyReport.getProgress())
+                    .address(dailyReport.getAddress())
+//                    .reporterId(userId)
+                    .user(users)
+                    .category(category)
+                    .contractor(dailyReport.getContractor())
+                    .numberWorker(dailyReport.getNumberWorker())
+                    .quantity(dailyReport.getQuantity())
+                    .quantityCompleted(dailyReport.getQuantityCompleted())
+                    .quantityRemain(dailyReport.getQuantityRemain())
+                    .requester(dailyReport.getRequester())
+                    .project(project)
+                    .build();
 
-         report = dailyReportRepository.save(report);
+            Implement implement = Implement.builder()
+                    .createAt(LocalDateTime.now())
+                    .implement(dailyReport.getImplement())
+                    .users(users)
+                    .projects(project)
+                    .build();
 
-        project.setProgress(dailyReport.getProgress().intValue());
-        project = projectRepository.save(project);
+            report = dailyReportRepository.save(report);
 
-         if(Objects.nonNull(report.getReportId())) {
-             implement=  implementRepository.save(implement);
-             return true;
-         }else {
-             return false;
-         }
-//return true;
+            project.setProgress(dailyReport.getProgress().intValue());
+            projectRepository.save(project);
+            if (Objects.nonNull(report.getReportId())) {
+                implement = implementRepository.save(implement);
+                return true;
+            } else {
+                return false;
+            }
+        } else if (check.size() == 1) {
+            log.info("single daily report");
+            DailyReport report = check.get(0);
+            List<Implement> implement = implementRepository.findImplement(dailyReport.getProjectId(), userId, startOfDay, endOfDay);
+            Implement firstImplement = implement.get(0);
 
+            report.setCreate_at(LocalDateTime.now());
+            report.setEndDate(dailyReport.getEndDate());
+            report.setStartDate(dailyReport.getStartDate());
+//            report.setUser(users);
+//            report.setCategory(category);
+            report.setContractor(dailyReport.getContractor());
+            report.setNumberWorker(dailyReport.getNumberWorker());
+            report.setQuantity(dailyReport.getQuantity());
+            report.setQuantityCompleted(dailyReport.getQuantityCompleted());
+            report.setQuantityRemain(dailyReport.getQuantityRemain());
+            report.setRequester(dailyReport.getRequester());
+//            report.setProject(project);
+            report.setProgress(dailyReport.getProgress());
+            report.setAddress(report.getAddress());
+
+            dailyReportRepository.save(report);
+            firstImplement.setCreateAt(LocalDateTime.now());
+            firstImplement.setImplement(dailyReport.getImplement());
+            implementRepository.save(firstImplement);
+            return true;
+        } else {
+            log.info("multiple daily report");
+            return false;
+        }
     }
-
-//    @Override
-//    public DailyReport updateDailyReport(Long id, DailyReportDTO dailyReport) {
-//        DailyReport existingDailyReport = dailyReportRepository.findById(id)
-//                .orElseThrow(() -> new RuntimeException("DailyReport not found"));
-//        Category category = cateRepository.FindByCategoryId(dailyReport.getCategoryId());
-//        DailyReport updatedDailyReport = DailyReport.builder()
-//                .reportId(existingDailyReport.getReportId())
-//                .create_at(dailyReport.getCreate_at())
-//                .projectId(dailyReport.getProjectId())
-//                .address(dailyReport.getAddress())
-//                .quantity(dailyReport.getQuantity())
-//                .categoryId(category)
-//                .quantityCompleted(dailyReport.getQuantityCompleted())
-//                .quantityRemain(dailyReport.getQuantityRemain())
-//                .contractor(dailyReport.getContractor())
-//                .numberWorker(dailyReport.getNumberWorker())
-//                .requester(dailyReport.getRequester())
-//                .build();
-//
-//        return dailyReportRepository.save(updatedDailyReport);
-//    }
 
     @Override
     public void deleteDailyReport(Long id) {
@@ -135,7 +150,7 @@ public class DailyReportImpl implements DailyReportService {
     public DailyReport getByProjectId(String userId, Long projectId) {
 
         Pageable pageable = PageRequest.of(0, 1);
-        return dailyReportRepository.findByProjectId(userId,projectId, pageable).stream().findFirst().orElse(null);
+        return dailyReportRepository.findByProjectId(userId, projectId, pageable).stream().findFirst().orElse(null);
 
     }
 

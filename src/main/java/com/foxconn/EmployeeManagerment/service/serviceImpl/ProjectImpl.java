@@ -89,6 +89,7 @@ public class ProjectImpl extends BaseController implements ProjectService {
                 .endDate(projectDto.getEndDate())
                 .progress(0)
                 .canceled(false)
+                .isDeleted(false)
                 .build();
         project = projectRepository.save(project);
 
@@ -130,7 +131,7 @@ public class ProjectImpl extends BaseController implements ProjectService {
 
     @Override
     public List<Project> getAllProject() {
-        return projectRepository.findAll();
+        return projectRepository.findAllProject();
     }
 
     @Override
@@ -149,8 +150,8 @@ public class ProjectImpl extends BaseController implements ProjectService {
     }
 
     @Override
-    public List<ChartDto> getDashboard() {
-        return projectRepository.getCharts();
+    public List<ChartDto> getDashboard(int year) {
+        return projectRepository.getCharts(year);
     }
 
     @Override
@@ -169,8 +170,8 @@ public class ProjectImpl extends BaseController implements ProjectService {
     }
 
     @Override
-    public List<ProjectCompleted2> getCompleted2() {
-        return projectRepository.getCompleted2();
+    public List<ProjectCompleted2> getCompleted2(int year) {
+        return projectRepository.getCompleted2(year);
     }
 
     @Override
@@ -217,9 +218,24 @@ public class ProjectImpl extends BaseController implements ProjectService {
         String categoryId = category.getCategoryId();
         Boolean completed = projectDTO.getCompleted();
         Boolean cancelled = projectDTO.getCancelled();
-        return projectRepository.getByChart(categoryId, completed, cancelled);
+        int year = projectDTO.getYear();
+        return projectRepository.getByChart(categoryId, completed, cancelled, year);
 
     }
 
+    @Override
+    public boolean deleteProject(Long projectId, String userId) {
+        Users user = userRepository.findByUid(userId);
+
+        Project project = projectRepository.findByProjectId(projectId);
+        Assert.notNull(project, "PROJECT_NOT_FOUND");
+        if(project.getIsDeleted()){
+            throw new RuntimeException("PROJECT_DELETED");
+        }else {
+            projectRepository.deleteProject(projectId, user.getUid());
+
+            return true;
+        }
+    }
 
 }

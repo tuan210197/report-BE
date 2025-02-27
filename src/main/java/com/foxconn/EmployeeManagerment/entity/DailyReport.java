@@ -21,8 +21,8 @@ public class DailyReport {
     @Column(name = "report_id")
     private Long reportId;
 
-    @Column(name = "reporter_id")
-    private String reporterId;
+//    @Column(name = "reporter_id")
+//    private String reporterId;
 
     @Column(name = "createAt")
     private LocalDateTime create_at;
@@ -72,7 +72,6 @@ public class DailyReport {
     private Project project;
 
     @ManyToOne
-//    @JsonIgnore
-    @JoinColumn(name = "reporter_id", referencedColumnName = "uid", insertable = false, updatable = false)
+    @JoinColumn(name = "reporter_id",  updatable = false)
     private Users user;
 }

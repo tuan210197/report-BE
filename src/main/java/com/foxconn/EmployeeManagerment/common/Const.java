@@ -20,10 +20,10 @@ public class Const {
     public  static final LocalDateTime NOW = LocalDateTime.now();
 
     public static class ROLE {
-        public static final String GD = "GIÁM ĐỐC";
-        public static final String PGD = "PHÓ GIÁM ĐỐC";
-        public static final String MGR = "CHUYÊN VIÊN";
-        public static final String AM = "NHÂN VIÊN";
+        public static final String GD = "GD";
+        public static final String PGD = "PGD";
+        public static final String MGR = "MGR";
+        public static final String AM = "NV";
     }
 
     public static class ErrorCode {

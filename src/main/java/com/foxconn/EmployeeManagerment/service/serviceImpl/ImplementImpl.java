@@ -11,9 +11,11 @@ import com.foxconn.EmployeeManagerment.service.ImplementService;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ImplementImpl implements ImplementService {
@@ -77,6 +79,12 @@ public class ImplementImpl implements ImplementService {
     @Override
     public List<Implement> getImplementsByUserImplement(String userImplement) {
         return implementRepository.findByUsers(userImplement);
+    }
+
+    @Override
+    public List<String> getImplementByProject(Long projectId) {
+        List<Implement> list = implementRepository.getImplementByProjects(projectId);
+        return list.stream().map(Implement::getImplement).toList();
     }
 
 //    @Override

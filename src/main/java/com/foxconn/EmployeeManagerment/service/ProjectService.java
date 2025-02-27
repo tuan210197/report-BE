@@ -27,7 +27,7 @@ public interface ProjectService {
 
     Boolean checkOwnerProject(String uid, Long projectId);
 
-    List<ChartDto> getDashboard();
+    List<ChartDto> getDashboard(int year);
 
     List<CategoryCountDTO> getTotal();
 
@@ -35,7 +35,7 @@ public interface ProjectService {
 
     List<ProjectProjection> getProjectName();
 
-    List<ProjectCompleted2> getCompleted2();
+    List<ProjectCompleted2> getCompleted2(int year);
 
     boolean updateStatus(ProjectUpdateDTO projectDTO);
 
@@ -44,4 +44,6 @@ public interface ProjectService {
     List<Project> getProjectByName(String projectName);
 
     List<Project> searchChart(ProjectDTO projectDTO);
+
+    boolean deleteProject(Long projectId, String userId);
 }

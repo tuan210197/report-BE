@@ -24,9 +24,9 @@ import java.util.List;
 @RequestMapping("/api/project")
 public class ProjectController extends BaseController {
 
-    @Autowired
+
     private final ProjectService projectService;
-    @Autowired
+
     private final ProjectRepository projectRepository;
 
 
@@ -116,12 +116,13 @@ public class ProjectController extends BaseController {
 
     }
 
-    @GetMapping(value = "/dashboard")
-    public ResponseEntity<?> getDashboard(HttpServletRequest request) {
+    @PostMapping(value = "/dashboard")
+    public ResponseEntity<?> getDashboard(HttpServletRequest request, @RequestBody int year) {
+
 
         UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))) {
-        return ResponseEntity.ok(projectService.getDashboard());
+        return ResponseEntity.ok(projectService.getDashboard(year));
 //        }
 //        else {
 //            return toExceptionResult("NO PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR);
@@ -138,9 +139,9 @@ public class ProjectController extends BaseController {
         return ResponseEntity.ok(projectService.getCompleted());
     }
 
-    @GetMapping("/get-completed2")
-    public ResponseEntity<?> getCompleted2(HttpServletRequest request) {
-        return ResponseEntity.ok(projectService.getCompleted2());
+    @PostMapping("/get-completed2")
+    public ResponseEntity<?> getCompleted2(HttpServletRequest request, @RequestBody int year) {
+        return ResponseEntity.ok(projectService.getCompleted2(year));
     }
 
     @GetMapping("/get-project-name")
@@ -165,7 +166,7 @@ public class ProjectController extends BaseController {
     @PostMapping("/search-chart")
     public ResponseEntity<?> searchChart(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {
         List<Project> projects = projectService.searchChart(projectDTO);
-        if(!projects.isEmpty()) {
+        if (!projects.isEmpty()) {
             return toSuccessResult(projects, "SUCCESS");
         } else {
             return toExceptionResult("NO DATA", Const.API_RESPONSE.RETURN_CODE_ERROR);
@@ -177,5 +178,20 @@ public class ProjectController extends BaseController {
         List<Project> projects = projectService.getProjectByName(projectDTO.getProjectName());
         return toSuccessResult(projects, "SUCCESS");
 
+    }
+
+    @PostMapping("/delete")
+    public ResponseEntity<?> delete(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {
+        UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String uid = this.getCurrentUser().getUid().trim();
+        if (auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(Const.ROLE.GD))) {
+            if (projectService.deleteProject(projectDTO.getProjectId(),uid)) {
+                return toSuccessResult(null, "DELETE SUCCESS");
+            } else {
+                return toExceptionResult("DELETE FALSE", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            }
+        }else {
+            return toExceptionResult("NO PERMISSION", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
     }
 }

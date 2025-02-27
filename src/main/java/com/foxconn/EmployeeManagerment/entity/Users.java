@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.UUID;
 
 
-
 @SqlResultSetMapping(
         name = Const.ResultSetMapping.USER_INFO_DTO,
         classes = {
@@ -74,7 +73,10 @@ public class Users {
     private Integer statusUpdate;
     @Column(name = "email")
     private String email;
-
+    @Column(name = "is_report")
+    private boolean isReport;
+    @Column(name = "is_receive")
+    private boolean isReceive;
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;
@@ -90,6 +92,10 @@ public class Users {
     @JsonIgnore
     @OneToMany(mappedBy = "pic", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Project> projects;
+
+//    @JsonIgnore
+//    @OneToMany(mappedBy = "project_delete", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<Project> project;
 
     @JsonIgnore
     @OneToMany(mappedBy = "users", cascade = CascadeType.ALL, orphanRemoval = true)

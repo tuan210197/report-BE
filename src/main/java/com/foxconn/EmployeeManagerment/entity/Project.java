@@ -32,8 +32,6 @@ public class Project {
     @Column(name = "description")
     private String description;
 
-//    @Column(name = "pic", nullable = false)
-//    private String pic;
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
@@ -95,6 +93,12 @@ public class Project {
     @Column(name = "canceled ")
     private Boolean canceled;
 
+    @Column(name = "year")
+    private Integer year;
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @JsonIgnore
     @OneToMany(mappedBy = "projects", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Implement> implement;
@@ -116,6 +120,11 @@ public class Project {
     @ManyToOne
     @JoinColumn(name = "pic")
     private Users pic;
+
+    //    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "user_delete")
+    private Users userDeleted;
 
     @JsonIgnore
     @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, orphanRemoval = true)
