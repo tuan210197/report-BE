@@ -3,14 +3,10 @@ package com.foxconn.EmployeeManagerment.controller;
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.dto.request.SubMemberDTO;
 import com.foxconn.EmployeeManagerment.entity.SubMember;
-import com.foxconn.EmployeeManagerment.projection.SubMemberProjection;
 import com.foxconn.EmployeeManagerment.service.SubMemberService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

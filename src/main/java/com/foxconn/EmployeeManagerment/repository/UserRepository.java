@@ -1,6 +1,7 @@
 package com.foxconn.EmployeeManagerment.repository;
 
 import com.foxconn.EmployeeManagerment.entity.Users;
+import com.foxconn.EmployeeManagerment.projection.EmailReportProjection;
 import com.foxconn.EmployeeManagerment.projection.UserProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -28,4 +29,22 @@ public interface UserRepository extends JpaRepository<Users, String> {
 
     @Query("SELECT trim(u.uid) as uid, u.fullName as fullName FROM Users u ")
     List<UserProjection> getAllUser();
+
+    @Query("select u.email from Users u where u.isReceive = true")
+    List<String> getUserEmail();
+
+    @Query(value = """
+            SELECT u.uid, u.full_name,
+                  CASE
+                      WHEN r.reporter_id IS NOT NULL THEN '已报告'
+                      ELSE '尚未报道'
+                      END AS report
+                      FROM emt.users u
+                      LEFT JOIN emt.daily_report r
+                      ON u.uid = r.reporter_id
+                      AND r.create_at::DATE between CURRENT_DATE   and now()
+                      where u.is_report = true
+                      GROUP BY u.uid, u.full_name, r.reporter_id """, nativeQuery = true)
+
+    List<EmailReportProjection> getUserReport();
 }

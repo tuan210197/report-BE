@@ -22,7 +22,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     @Query("select d from DailyReport d order by d.create_at desc")
     List<DailyReport> findAllDailyReport();
 
-    @Query("SELECT d FROM  DailyReport d where d.project.projectId =:projectId and d.user.uid = :userId order by d.create_at desc")
+    @Query("SELECT d FROM  DailyReport d where d.project.projectId =:projectId and trim(d.user.uid) = :userId order by d.create_at desc")
     List<DailyReport> findByProjectId(@Param("userId") String userId, @Param("projectId") Long projectId, Pageable pageable);
 
     @Query(value = """

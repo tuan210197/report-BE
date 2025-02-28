@@ -24,7 +24,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     @Query(value = "Select p from Project p where p.projectId = :projectId AND p.isDeleted = false ")
     Project findByProjectId(@Param( "projectId") Long projectId);
 
-    @Query(value = "SELECT p FROM Project p where p.isDeleted = false order by p.completed asc")
+    @Query(value = "SELECT p FROM Project p " +
+            "WHERE p.isDeleted = false " +
+            "ORDER BY CASE WHEN p.completed = true THEN 1 ELSE 0 END, p.projectId ASC")
     List<Project> checkProjectByUserId(@Param("userId") String userId);
 
 

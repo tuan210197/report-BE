@@ -95,6 +95,9 @@ public class ProjectImpl extends BaseController implements ProjectService {
 
         return project.getProjectId();
     }
+    public Integer getYearFromDateTime(LocalDate dateTime) {
+        return dateTime.getYear();
+    }
 
     @Override
     @Transactional
@@ -104,6 +107,10 @@ public class ProjectImpl extends BaseController implements ProjectService {
         Project projectCheck = projectRepository.findByProjectId(project.getProjectId());
         Assert.notNull(projectCheck, "PROJECT_NOT_FOUND");
 
+        LocalDate dateTime = project.getStartDate();
+        Integer year = getYearFromDateTime(dateTime);
+
+        Assert.notNull(dateTime, "START DATE CANNOT BE NULL");
         projectCheck.setStartDate(project.getStartDate());
         projectCheck.setStartPO(project.getStartPO());
         projectCheck.setStartEstimate(project.getStartEstimate());
@@ -121,9 +128,9 @@ public class ProjectImpl extends BaseController implements ProjectService {
         projectCheck.setEndRequestPurchase(project.getEndRequestPurchase());
         projectCheck.setEndQuotation(project.getEndQuotation());
         projectCheck.setEndSubmitBudget(project.getEndSubmitBudget());
+        projectCheck.setYear(year);
 
         projectCheck.setPic(user);
-
         projectRepository.save(projectCheck);
 
         return true;
