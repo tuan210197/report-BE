@@ -22,7 +22,7 @@ public class DailyReportDTO {
     private String contractor;
     private Long numberWorker;
     private String requester;
-    private Long progress;
+//    private Long progress;
     private LocalDate startDate;
     private LocalDate endDate;
     private String implement;

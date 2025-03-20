@@ -1,5 +1,6 @@
 package com.foxconn.EmployeeManagerment.service;
 
+import com.foxconn.EmployeeManagerment.dto.request.FromToDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
@@ -27,7 +28,7 @@ public interface ProjectService {
 
     Boolean checkOwnerProject(String uid, Long projectId);
 
-    List<ChartDto> getDashboard(int year);
+    List<ChartDto> getDashboard();
 
     List<CategoryCountDTO> getTotal();
 
@@ -35,9 +36,9 @@ public interface ProjectService {
 
     List<ProjectProjection> getProjectName();
 
-    List<ProjectCompleted2> getCompleted2(int year);
+    List<ProjectCompleted2> getCompleted2();
 
-    boolean updateStatus(ProjectUpdateDTO projectDTO);
+    boolean updateStatus(ProjectUpdateDTO projectDTO, String userId);
 
     List<Project> search(String projectName);
 
@@ -46,4 +47,10 @@ public interface ProjectService {
     List<Project> searchChart(ProjectDTO projectDTO);
 
     boolean deleteProject(Long projectId, String userId);
+
+    List<ProjectCompleted2> getTotalFromTo(int from, int to);
+
+    List<ChartDto> getDashboardFromTo(int from, int to);
+
+    List<Project> searchChartFromTo(FromToDTO dto);
 }

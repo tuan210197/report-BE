@@ -29,6 +29,9 @@ public class Implement {
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
+//    @Column(name = "daily_report_id")
+//    private Long dailyReportId;
+
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)
     private Project projects;

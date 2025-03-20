@@ -50,7 +50,6 @@ public abstract class BaseController {
         return new ResponseEntity<>(message, HttpStatus.valueOf(code));
     }
 
-    @Transactional
     public Users getCurrentUser() {
         UserDetails user = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         String email = user.getUsername();

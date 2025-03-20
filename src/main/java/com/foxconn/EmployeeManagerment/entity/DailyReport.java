@@ -20,7 +20,7 @@ public class DailyReport {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "report_id")
     private Long reportId;
-
+//
 //    @Column(name = "reporter_id")
 //    private String reporterId;
 
@@ -58,8 +58,6 @@ public class DailyReport {
     @Column(name = "requester", nullable = false)
     private String requester;
 
-    @Column(name = "progress", nullable = false)
-    private Long progress;
 
     @Column(name = "start_date")
     private LocalDate startDate;

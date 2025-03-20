@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+@SuppressWarnings("ALL")
 @Repository
 public interface UserRepository extends JpaRepository<Users, String> {
 
@@ -30,14 +31,14 @@ public interface UserRepository extends JpaRepository<Users, String> {
     @Query("SELECT trim(u.uid) as uid, u.fullName as fullName FROM Users u ")
     List<UserProjection> getAllUser();
 
-    @Query("select u.email from Users u where u.isReceive = true")
+    @Query("select u.email from Users u where u.isReceive = true order by u.role.role_id")
     List<String> getUserEmail();
 
     @Query(value = """
             SELECT u.uid, u.full_name,
                   CASE
-                      WHEN r.reporter_id IS NOT NULL THEN '已报告'
-                      ELSE '尚未报道'
+                      WHEN r.reporter_id IS NOT NULL THEN '已報告'
+                      ELSE '未報告'
                       END AS report
                       FROM emt.users u
                       LEFT JOIN emt.daily_report r

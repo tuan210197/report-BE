@@ -33,7 +33,7 @@ public class ProjectDTO {
 
     private LocalDate endDate;
 
-    private int progress;
+    private String status;
 
     private LocalDate startReceiveRequest;
 
@@ -70,6 +70,8 @@ public class ProjectDTO {
     private Boolean isDeleted;
 
     private int year;
+
+    private String type;
 
 
 }

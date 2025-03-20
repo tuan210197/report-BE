@@ -16,7 +16,7 @@ import java.util.List;
 public interface DailyReportRepository extends JpaRepository<DailyReport, Long> {
 //    List<DailyReport> findByProjectId(Long projectId);
 
-    @Query("SELECT  d FROM DailyReport d  WHERE d.user.uid = :uid order by d.create_at desc")
+    @Query("SELECT  d FROM DailyReport d  WHERE trim(d.user.uid) = :uid order by d.create_at desc")
     List<DailyReport> findByUerDetail(@Param("uid") String uid);
 
     @Query("select d from DailyReport d order by d.create_at desc")
@@ -42,7 +42,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
                     r.address AS address, 
                     r.contractor AS contractor,
                     r.number_worker AS numberWorker,
-                    r.progress AS progress,
+
                     r.quantity AS quantity,
                     r.quantity_completed AS quantityCompleted,
                     r.quantity_remain AS quantityRemain,
@@ -74,5 +74,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
                                  @Param("userId") String userId,
                                  @Param("startOfDay") LocalDateTime startOfDay,
                                  @Param("endOfDay") LocalDateTime endOfDay);
-
+    @Query("SELECT d FROM DailyReport d where upper(coalesce(d.project.projectName,'')) like %:keyword% " +
+            "or upper(COALESCE(d.user.fullName, '')) LIKE %:keyword%")
+    List<DailyReport> search(String keyword);
 }

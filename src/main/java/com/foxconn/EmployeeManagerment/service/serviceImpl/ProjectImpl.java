@@ -1,6 +1,8 @@
 package com.foxconn.EmployeeManagerment.service.serviceImpl;
 
+import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.controller.BaseController;
+import com.foxconn.EmployeeManagerment.dto.request.FromToDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
@@ -20,29 +22,32 @@ import org.springframework.util.Assert;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Objects;
 
 @Slf4j
 @Service
 public class ProjectImpl extends BaseController implements ProjectService {
+    private final StatusUpdateHisRepository statusUpdateHisRepository;
+    private final StatusRepository statusRepository;
     private final CategoryRepository categoryRepository;
 
 
     private final ProjectRepository projectRepository;
-    private final SubMemberRepository subMemberRepository;
     private final CateRepository cateRepository;
     private final UserRepository userRepository;
-    private final MailSenderService mailSenderService;
 
-    public ProjectImpl(ProjectRepository projectRepository, SubMemberRepository subMemberRepository, CateRepository cateRepository, UserRepository userRepository, MailSenderService mailSenderService,
-                       CategoryRepository categoryRepository) {
+    public ProjectImpl(ProjectRepository projectRepository,  CateRepository cateRepository, UserRepository userRepository,
+                       CategoryRepository categoryRepository,
+                       StatusRepository statusRepository,
+                       StatusUpdateHisRepository statusUpdateHisRepository) {
         this.projectRepository = projectRepository;
-        this.subMemberRepository = subMemberRepository;
         this.cateRepository = cateRepository;
         this.userRepository = userRepository;
-        this.mailSenderService = mailSenderService;
         this.categoryRepository = categoryRepository;
+        this.statusRepository = statusRepository;
+        this.statusUpdateHisRepository = statusUpdateHisRepository;
     }
 
 
@@ -60,6 +65,9 @@ public class ProjectImpl extends BaseController implements ProjectService {
     public Long createProject(ProjectDTO projectDto, String userId) throws Exception {
         Users user = userRepository.findByUid(userId);
         Category category = cateRepository.getOneCategory(projectDto.getCategoryId());
+        Status status = statusRepository.findById("new").orElseThrow(
+                () -> new RuntimeException("Status not found")
+        );
         Assert.notNull(category, "CATEGORY_NOT_FOUND");
         Assert.notNull(user, "USER NOT FOUND");
 
@@ -88,6 +96,8 @@ public class ProjectImpl extends BaseController implements ProjectService {
                 .endPO(projectDto.getEndPO())
                 .endDate(projectDto.getEndDate())
                 .progress(0)
+                .status(status)
+                .year(projectDto.getYear())
                 .canceled(false)
                 .isDeleted(false)
                 .build();
@@ -95,6 +105,7 @@ public class ProjectImpl extends BaseController implements ProjectService {
 
         return project.getProjectId();
     }
+
     public Integer getYearFromDateTime(LocalDate dateTime) {
         return dateTime.getYear();
     }
@@ -157,9 +168,15 @@ public class ProjectImpl extends BaseController implements ProjectService {
     }
 
     @Override
-    public List<ChartDto> getDashboard(int year) {
-        return projectRepository.getCharts(year);
+    public List<ChartDto> getDashboard() {
+        return projectRepository.getCharts();
     }
+
+    @Override
+    public List<ChartDto> getDashboardFromTo(int from, int to) {
+        return projectRepository.getChartFromTo(from, to);
+    }
+
 
     @Override
     public List<CategoryCountDTO> getTotal() {
@@ -177,34 +194,59 @@ public class ProjectImpl extends BaseController implements ProjectService {
     }
 
     @Override
-    public List<ProjectCompleted2> getCompleted2(int year) {
-        return projectRepository.getCompleted2(year);
+    public List<ProjectCompleted2> getCompleted2() {
+        return projectRepository.getCompleted2();
     }
 
     @Override
-    public boolean updateStatus(ProjectUpdateDTO projectDTO) {
+    public List<ProjectCompleted2> getTotalFromTo(int fromYear, int toYear) {
+        return projectRepository.getTotalFromTo(fromYear, toYear);
+    }
+
+    @Override
+    @Transactional
+    public boolean updateStatus(ProjectUpdateDTO projectDTO, String uid) {
         Project project = projectRepository.findByProjectId(projectDTO.getProjectId());
+        Status status = statusRepository.findById(projectDTO.getStatus()).orElseThrow(
+                () -> new RuntimeException("Status not found"));
         Assert.notNull(project, "PROJECT_NOT_FOUND");
-
-
-        if (Objects.equals(projectDTO.getStatus(), "completed")) {
-            project.setCompleted(true);
-            project.setProgress(100);
-            project.setCanceled(false);
+        project.setStatus(status);
+        switch (status.getStatusId()) {
+            case Const.STATUS_PROJECT.COMPLETED -> {
+                project.setCompleted(true);
+                project.setCanceled(false);
+                project.setAccepted(false);
+            }
+            case Const.STATUS_PROJECT.CANCELLED -> {
+                project.setCompleted(false);
+                project.setCanceled(true);
+                project.setAccepted(false);
+            }
+            case Const.STATUS_PROJECT.ACCEPTANCE, Const.STATUS_PROJECT.CONSTRUCTION -> {
+                project.setCompleted(false);
+                project.setCanceled(false);
+                project.setAccepted(true);
+            }
+            default -> {
+                project.setCompleted(false);
+                project.setCanceled(false);
+                project.setAccepted(false);
+            }
         }
-        if (Objects.equals(projectDTO.getStatus(), "remain")) {
-            project.setCompleted(false);
-            project.setProgress(99);
-            project.setCanceled(false);
-        }
-        if (Objects.equals(projectDTO.getStatus(), "canceled")) {
-            project.setCanceled(true);
-        }
-
+        project.setStatus(status);
         this.projectRepository.save(project);
 
+        StatusUpdateHis statusUpdateHis = StatusUpdateHis.builder()
+                .project(project)
+                .status(status)
+                .user(userRepository.findByUid(uid))
+                .createAt(OffsetDateTime.now())
+                .build();
+        statusUpdateHisRepository.save(statusUpdateHis);
         return true; // Không cập nhật (do không tìm thấy hoặc trạng thái đã là true)
     }
+
+
 
     @Override
     public List<Project> search(String value) {
@@ -222,12 +264,55 @@ public class ProjectImpl extends BaseController implements ProjectService {
     public List<Project> searchChart(ProjectDTO projectDTO) {
         Category category = categoryRepository.findByCategoryName(projectDTO.getCategoryName());
         Assert.notNull(category, "CATEGORY_NOT_FOUND");
-        String categoryId = category.getCategoryId();
-        Boolean completed = projectDTO.getCompleted();
-        Boolean cancelled = projectDTO.getCancelled();
-        int year = projectDTO.getYear();
-        return projectRepository.getByChart(categoryId, completed, cancelled, year);
 
+        String categoryId = category.getCategoryId();
+        if (projectDTO.getType().contains("Total")) {
+            if (projectDTO.getType().equals("acceptanceTotal")) {
+                return projectRepository.getAcceptanceDataTotal(categoryId);
+            } else if (projectDTO.getType().equals("remainTotal")) {
+                return projectRepository.getInProgressDataTotal(categoryId);
+            } else {
+                return projectRepository.getByChart(categoryId, projectDTO.getStatus());
+
+            }
+        } else {
+            if (projectDTO.getType().equals("acceptance")) {
+                return projectRepository.getAcceptanceData(categoryId, projectDTO.getStatus());
+            } else if (projectDTO.getType().equals("remain")) {
+                return projectRepository.getInProgressData(categoryId);
+            } else {
+                return projectRepository.getByChart(categoryId, projectDTO.getStatus());
+            }
+        }
+    }
+
+    @Override
+    public List<Project> searchChartFromTo(FromToDTO dto) {
+        Category category = categoryRepository.findByCategoryName(dto.getCategoryName());
+        Assert.notNull(category, "CATEGORY_NOT_FOUND");
+        String categoryId = category.getCategoryId();
+//        Boolean completed = dto.getCompleted();
+//        Boolean cancelled = dto.getCancelled();
+        int from = dto.getFrom();
+        int to = dto.getTo();
+        if (dto.getType().contains("Total")) {
+            if (dto.getType().equals("acceptanceTotal")) {
+                return projectRepository.getAcceptanceDataTotalFromTo(categoryId, from, to);
+            } else if (dto.getType().equals("remainTotal")) {
+                return projectRepository.getInProgressDataTotalFromTo(categoryId, from, to);
+            } else {
+                return projectRepository.getByChartFromTo(categoryId, dto.getStatus(), from, to);
+            }
+        } else {
+            if (dto.getType().equals("acceptance")) {
+                return projectRepository.getAcceptanceDataFromTo(categoryId, dto.getStatus(), from, to);
+            } else if (dto.getType().equals("remain")) {
+                return projectRepository.getInProgressDataFromTo(categoryId, from, to);
+            } else {
+                return projectRepository.getByChartFromTo(categoryId, dto.getStatus(), from, to);
+            }
+        }
+//        return projectRepository.getByChartFromTo(categoryId, completed, cancelled, from, to);
     }
 
     @Override
@@ -236,9 +321,9 @@ public class ProjectImpl extends BaseController implements ProjectService {
 
         Project project = projectRepository.findByProjectId(projectId);
         Assert.notNull(project, "PROJECT_NOT_FOUND");
-        if(project.getIsDeleted()){
+        if (project.getIsDeleted()) {
             throw new RuntimeException("PROJECT_DELETED");
-        }else {
+        } else {
             projectRepository.deleteProject(projectId, user.getUid());
 
             return true;

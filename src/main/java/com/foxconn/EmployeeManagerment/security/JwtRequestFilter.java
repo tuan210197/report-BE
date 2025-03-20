@@ -98,7 +98,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        }
+         }
 
         chain.doFilter(request, response);
     }

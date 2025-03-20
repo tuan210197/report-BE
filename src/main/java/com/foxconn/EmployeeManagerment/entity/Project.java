@@ -32,7 +32,6 @@ public class Project {
     @Column(name = "description")
     private String description;
 
-
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
@@ -42,7 +41,7 @@ public class Project {
     @Column(name = "end_date")
     private LocalDate endDate;
 
-    @Column(name = "progress" )
+    @Column(name = "progress")
     private int progress;
 
     @Column(name = "start_receive_request")
@@ -93,6 +92,12 @@ public class Project {
     @Column(name = "canceled ")
     private Boolean canceled;
 
+//    @Column(name = "contructed ")
+//    private Boolean constructed;
+
+    @Column(name = "accepted ")
+    private Boolean accepted;
+
     @Column(name = "year")
     private Integer year;
 
@@ -103,7 +108,7 @@ public class Project {
     @OneToMany(mappedBy = "projects", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Implement> implement;
 
-//    @JsonIgnore
+    //    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
@@ -116,7 +121,7 @@ public class Project {
     @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FileUpload> project;
 
-//    @JsonIgnore
+    //    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "pic")
     private Users pic;
@@ -130,6 +135,7 @@ public class Project {
     @OneToMany(mappedBy = "projectId", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubMember> subMembers;
 
-
-
+    @ManyToOne
+    @JoinColumn(name = "status_id")
+    private Status status;
 }

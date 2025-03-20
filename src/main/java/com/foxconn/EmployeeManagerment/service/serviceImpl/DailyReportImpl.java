@@ -57,7 +57,7 @@ public class DailyReportImpl implements DailyReportService {
                     .create_at(LocalDateTime.now())
                     .endDate(dailyReport.getEndDate())
                     .startDate(dailyReport.getStartDate())
-                    .progress(dailyReport.getProgress())
+//                    .progress(dailyReport.getProgress())
                     .address(dailyReport.getAddress())
 //                    .reporterId(userId)
                     .user(users)
@@ -71,17 +71,18 @@ public class DailyReportImpl implements DailyReportService {
                     .project(project)
                     .build();
 
+
+
+            report = dailyReportRepository.save(report);
             Implement implement = Implement.builder()
                     .createAt(LocalDateTime.now())
+//                    .dailyReportId(report.getReportId())
                     .implement(dailyReport.getImplement())
                     .users(users)
                     .projects(project)
                     .build();
-
-            report = dailyReportRepository.save(report);
-
-            project.setProgress(dailyReport.getProgress().intValue());
-            projectRepository.save(project);
+//            project.setProgress(dailyReport.getProgress().intValue());
+//            projectRepository.save(project);
             if (Objects.nonNull(report.getReportId())) {
                 implement = implementRepository.save(implement);
                 return true;
@@ -106,7 +107,7 @@ public class DailyReportImpl implements DailyReportService {
             report.setQuantityRemain(dailyReport.getQuantityRemain());
             report.setRequester(dailyReport.getRequester());
 //            report.setProject(project);
-            report.setProgress(dailyReport.getProgress());
+//            report.setProgress(dailyReport.getProgress());
             report.setAddress(report.getAddress());
 
             dailyReportRepository.save(report);
@@ -151,6 +152,12 @@ public class DailyReportImpl implements DailyReportService {
 
         Pageable pageable = PageRequest.of(0, 1);
         return dailyReportRepository.findByProjectId(userId, projectId, pageable).stream().findFirst().orElse(null);
+
+    }
+
+    @Override
+    public List<DailyReport> search(String keyword) {
+        return dailyReportRepository.search(keyword);
 
     }
 

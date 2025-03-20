@@ -90,9 +90,20 @@ public class Const {
 
     }
 
-    public static Const getInstance() {
-        return instance;
-    }
+public static class STATUS_PROJECT {
+        public static final String NEW = "new";
+        public static final String ESTIMATE = "estimate";
+        public static final String BUDGET = "budget";
+        public static final String SUBMIT_BUDGET = "submit_budget";
+        public static final String PR_PO = "prpo";
+        public static final String CONSTRUCTION = "construction";
+        public static final String ACCEPTANCE = "acceptance";
+        public static final String COMPLETED = "completed";
+        public static final String DELETE = "delete";
+        public static final String CANCELLED = "cancelled";
+
+
+}
 
 
     public static ResourceBundle getBundle(String language) {

@@ -2,6 +2,7 @@ package com.foxconn.EmployeeManagerment.controller;
 
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.dto.request.DailyReportDTO;
+import com.foxconn.EmployeeManagerment.dto.request.DailyReportSearchDTO;
 import com.foxconn.EmployeeManagerment.dto.request.DateDTO;
 import com.foxconn.EmployeeManagerment.entity.DailyReport;
 import com.foxconn.EmployeeManagerment.entity.Project;
@@ -25,7 +26,7 @@ import java.util.List;
 @Slf4j
 @CrossOrigin
 @RequestMapping("/api/daily-report")
-public class DailyReportController extends  BaseController{
+public class DailyReportController extends BaseController {
 
     private final DailyReportService dailyReportService;
     private final ProjectService projectService;
@@ -44,9 +45,9 @@ public class DailyReportController extends  BaseController{
 
         String userId = this.getCurrentUser().getUid().trim();
 
-        if(dailyReportService.createDailyReport(dailyReport,  userId)){
+        if (dailyReportService.createDailyReport(dailyReport, userId)) {
             return toSuccessResult(null, "TẠO BÁO CÁO THÀNH CÔNG");
-        }else {
+        } else {
             return toExceptionResult("TẠO BÁO CÁO LỖI", Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
 
@@ -91,10 +92,10 @@ public class DailyReportController extends  BaseController{
     @GetMapping("/find-by-uuid")
     public ResponseEntity<?> findDailyReportByUuid(HttpServletRequest request) {
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if( userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))){
+        if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))) {
             List<DailyReport> dailyReports = dailyReportService.getAllDailyReports();
             return ResponseEntity.ok(dailyReports);
-        }else{
+        } else {
             String uid = this.getCurrentUser().getUid().trim();
             List<DailyReport> dailyReports = dailyReportService.getDailyReportsByUserImplement(uid);
             return ResponseEntity.ok(dailyReports);
@@ -108,33 +109,43 @@ public class DailyReportController extends  BaseController{
         Project project = projectRepository.findByProjectId(dailyReportDTO.getProjectId());
         if (dailyReports != null && project != null) {
             return toSuccessResult(dailyReports, "SUCCESS");
-        }if(dailyReports == null && project != null){
-            return toSuccessResult(project, "SUCCESS");
         }
-        else {
+        if (dailyReports == null && project != null) {
+            return toSuccessResult(project, "SUCCESS");
+        } else {
             return toExceptionResult("PROJECT NOT FOUND", Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
     }
+
     @PostMapping("/export")
     public ResponseEntity<?> exportDailyReport(HttpServletRequest request, @RequestBody DateDTO dto) {
-        return ResponseEntity.ok( dailyReportRepository.export(dto.getDate()));
+        return ResponseEntity.ok(dailyReportRepository.export(dto.getDate()));
 
     }
+
     @GetMapping("/get-max-export-date")
     public ResponseEntity<?> exportDailyReport2(HttpServletRequest request) {
-        try{
+        try {
             String date = dailyReportRepository.getMaxDate();
-            if(date != null){
+            if (date != null) {
                 return toSuccessResult(date, "SUCCESS");
-            }else {
+            } else {
                 return toExceptionResult(null, Const.API_RESPONSE.RETURN_CODE_ERROR);
             }
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (Exception e) {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }
     }
 
+    @PostMapping("/search-report")
+    public ResponseEntity<?> searchDailyReport(@RequestBody DailyReportSearchDTO dto) {
+        List<DailyReport> list = dailyReportService.search(dto.getKeyword());
+        if (list != null) {
+            return toSuccessResult(list, "SUCCESS");
+        }else{
+            return toExceptionResult(null, Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    }
 }

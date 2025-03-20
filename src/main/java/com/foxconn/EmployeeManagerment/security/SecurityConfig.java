@@ -41,26 +41,23 @@ public class SecurityConfig implements WebMvcConfigurer {
     }
 
 
-
 //    @Override
 //    public void addCorsMappings(CorsRegistry registry) {
 //        registry.addMapping("/**")
 //                .allowedOrigins("http://localhost:4200/")
 
-//                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+    //                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
 //                .allowedHeaders("*")  // Cho phép tất cả các headers
 //                .allowCredentials(true);
 //    }
-@Override
-public void addCorsMappings(CorsRegistry registry) {
-    registry.addMapping("/**")
-            .allowedOriginPatterns("http://localhost:4200") // Chỉ định rõ nguồn gốc
-            .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
-            .allowedHeaders("*")
-            .allowCredentials(true);
-}
-
-
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                .allowedOriginPatterns("http://localhost:4200") // Chỉ định rõ nguồn gốc
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
+                .allowedHeaders("*")
+                .allowCredentials(true);
+    }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable).
@@ -72,7 +69,7 @@ public void addCorsMappings(CorsRegistry registry) {
                                         "/api/user/password/forget",
                                         "/api/user/password/change",
                                         "/api/user/check-auth"
-                                        )
+                                )
                                 .permitAll()
                                 .anyRequest().authenticated()
                 )
@@ -83,10 +80,12 @@ public void addCorsMappings(CorsRegistry registry) {
                 .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
@@ -97,7 +96,6 @@ public void addCorsMappings(CorsRegistry registry) {
 
         return new ProviderManager(authenticationProvider);
     }
-
     @Bean
     public FilterRegistrationBean<CookieCleanupFilter> cookieCleanupFilter() {
         // Đăng ký CookieCleanupFilter

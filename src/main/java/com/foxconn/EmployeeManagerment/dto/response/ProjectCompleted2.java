@@ -11,9 +11,10 @@ import lombok.Setter;
 public class ProjectCompleted2 {
 
     private Long total;
-    private Long news;
+    private Long cancelled;
     private Long remain;
     private Long completed;
+
 
 }
 

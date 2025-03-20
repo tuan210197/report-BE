@@ -16,4 +16,6 @@ public interface DailyReportService {
     List<DailyReport> getDailyReportsByUserImplement(String user);
 
     DailyReport getByProjectId(String userId, Long projectId);
+
+    List<DailyReport> search(String keyword);
 }
