@@ -17,7 +17,6 @@ public class FileUpload {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "file_id")
     private Long fileId;
-
     @Column(name = "file_name", unique = true, nullable = false)
     private String fileName;
     @Column(name = "file_patt")

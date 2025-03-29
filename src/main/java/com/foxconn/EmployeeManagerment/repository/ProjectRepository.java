@@ -5,6 +5,7 @@ import com.foxconn.EmployeeManagerment.dto.response.ChartDto;
 import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted;
 import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2;
 import com.foxconn.EmployeeManagerment.entity.Project;
+import com.foxconn.EmployeeManagerment.projection.MinMaxYearProjection;
 import com.foxconn.EmployeeManagerment.projection.ProjectProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -207,4 +208,9 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                                @Param("from") int from,
                                                @Param("to") int to);
 
+    @Query(value = "SELECT " +
+            "    MIN(EXTRACT(YEAR FROM start_date)) AS minYear," +
+            "    MAX(EXTRACT(YEAR FROM start_date)) AS maxYear " +
+            "FROM emt.project", nativeQuery = true)
+    MinMaxYearProjection getMinMaxYear();
 }

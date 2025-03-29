@@ -54,8 +54,10 @@ public class SecurityConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedOriginPatterns("http://localhost:4200") // Chỉ định rõ nguồn gốc
+//                .allowedOrigins("http://10.81.160.29:86")  // Chỉ đúng 1 origin, tránh wildcard *
                 .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD", "OPTIONS")
                 .allowedHeaders("*")
+                .exposedHeaders("Set-Cookie")  // Cho phép đọc Set-Cookie
                 .allowCredentials(true);
     }
     @Bean
