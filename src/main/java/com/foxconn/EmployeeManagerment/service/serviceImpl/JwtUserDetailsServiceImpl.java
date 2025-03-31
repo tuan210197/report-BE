@@ -229,7 +229,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         basicLogin.setExpireDate(LocalDateTime.now().plusMinutes(15));
         basicLogin.setRetryCount(0);
         basicLoginRepo.save(basicLogin);
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Reset Password is: " + otpToken);
+//        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your OTP Reset Password is: " + otpToken);
     }
 
     public void sendPassword(BasicLogin basicLogin, String subject) {
@@ -237,7 +237,7 @@ public class JwtUserDetailsServiceImpl extends BaseController implements JwtUser
         String password = generatePassword(10);
         basicLogin.setPassword(bcryptEncoder.encode(password));
         basicLoginRepo.save(basicLogin);
-        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your Password is: " + password);
+//        mailSenderService.sendSimpleMessage(basicLogin.getEmail(), subject, "Your Password is: " + password);
     }
 
     // update password when change password or forgot password

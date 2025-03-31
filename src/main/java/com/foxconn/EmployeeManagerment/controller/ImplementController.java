@@ -1,14 +1,18 @@
 package com.foxconn.EmployeeManagerment.controller;
 
 import com.foxconn.EmployeeManagerment.common.Const;
+import com.foxconn.EmployeeManagerment.dto.request.DateDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ImplementDto;
 import com.foxconn.EmployeeManagerment.entity.Implement;
 import com.foxconn.EmployeeManagerment.entity.Users;
+import com.foxconn.EmployeeManagerment.projection.DetailReportProjection;
+import com.foxconn.EmployeeManagerment.repository.DailyReportRepository;
 import com.foxconn.EmployeeManagerment.service.ImplementService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -18,9 +22,11 @@ import java.util.List;
 public class ImplementController extends BaseController {
 
     private final ImplementService implementService;
+    private final DailyReportRepository dailyReportRepository;
 
-    public ImplementController(ImplementService implementService) {
+    public ImplementController(ImplementService implementService, DailyReportRepository dailyReportRepository) {
         this.implementService = implementService;
+        this.dailyReportRepository = dailyReportRepository;
     }
 
     @PostMapping("/add")
@@ -71,6 +77,24 @@ public class ImplementController extends BaseController {
         } else {
             return toExceptionResult("No implementation found", Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
+    }
+
+    @PostMapping("/get-detail-report")
+    public ResponseEntity<?> getImplementDetailReport(@RequestBody DateDTO dateDTO) {
+
+       try {
+           LocalDate localDate = LocalDate.parse(dateDTO.getDate());
+           List<DetailReportProjection> list = dailyReportRepository.getDetailReport(localDate);
+           if (list != null) {
+               return toSuccessResult(list, "SUCCESS");
+           } else {
+               return toExceptionResult("No implementation found", Const.API_RESPONSE.RETURN_CODE_ERROR);
+           }
+       } catch (IllegalArgumentException e) {
+           return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
+       } catch (Exception e) {
+           return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
+       }
     }
 
 }

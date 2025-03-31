@@ -22,15 +22,14 @@ public class Implement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-
     @Column(name = "implement")
     private String implement;
 
     @Column(name = "create_at")
     private LocalDateTime createAt;
 
-//    @Column(name = "daily_report_id")
-//    private Long dailyReportId;
+    @Column(name = "report_id")
+    private Long reportId;
 
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false)

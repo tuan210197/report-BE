@@ -77,7 +77,6 @@ public class AuthenController extends BaseController {
             UserInfoDTO userInfoDTO = userDetailsService.getUserInfo(uid);
             String token = jwtTokenUtil.generateToken(userInfoDTO);
 
-
             // Create HttpOnly cookie
             ResponseCookie cookie = ResponseCookie.from("token", token)
                     .httpOnly(true)
@@ -87,27 +86,21 @@ public class AuthenController extends BaseController {
 //                    .sameSite("Strict") // Điều chỉnh nếu bạn muốn cho phép truy cập từ subdomain hoặc cross-origin
                     .sameSite("Lux")
                     .build();
-
             // Add the cookie to the response header
             HttpHeaders headers = new HttpHeaders();
             headers.add(HttpHeaders.SET_COOKIE, cookie.toString());
-
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), false);
 //            return toSuccessResult(new JwtResponse(token, userLoginDTO.getUserUid()), "");
             return ResponseEntity.ok()
                     .headers(headers)
                     .body(toSuccessResult(new JwtResponse("Token is set in cookie", userLoginDTO.getUserUid()), ""));
-
         } catch (IllegalArgumentException | InternalAuthenticationServiceException e) {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.RETURN_CODE_ERROR);
         } catch (DisabledException e) {
             return toExceptionResult("USER BỊ KHÓA HÃY LIÊN HỆ VỚI QUẢN TRỊ VIÊN", Const.API_RESPONSE.RETURN_CODE_ERROR);
-
         } catch (BadCredentialsException e) {
             userDetailsService.loginFailRetryCount(authenticationRequest.getEmail(), true);
             return toExceptionResult("MẬT KHẨU KHÔNG ĐÚNG", Const.API_RESPONSE.RETURN_CODE_ERROR);
-
-
         } catch (Exception e) {
             return toExceptionResult(e.getMessage(), Const.API_RESPONSE.SYSTEM_CODE_ERROR);
         }

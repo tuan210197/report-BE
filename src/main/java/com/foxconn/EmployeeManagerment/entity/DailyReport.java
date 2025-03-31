@@ -24,8 +24,8 @@ public class DailyReport {
 //    @Column(name = "reporter_id")
 //    private String reporterId;
 
-    @Column(name = "createAt")
-    private LocalDateTime create_at;
+    @Column(name = "create_at")
+    private LocalDateTime createAt;
 
 //    @Column(name = "project_id")
 //    private Long projectId;

@@ -54,7 +54,7 @@ public class DailyReportImpl implements DailyReportService {
         if (check.isEmpty()) {
             log.info("empty daily report");
             DailyReport report = DailyReport.builder()
-                    .create_at(LocalDateTime.now())
+                    .createAt(LocalDateTime.now())
                     .endDate(dailyReport.getEndDate())
                     .startDate(dailyReport.getStartDate())
 //                    .progress(dailyReport.getProgress())
@@ -76,7 +76,7 @@ public class DailyReportImpl implements DailyReportService {
             report = dailyReportRepository.save(report);
             Implement implement = Implement.builder()
                     .createAt(LocalDateTime.now())
-//                    .dailyReportId(report.getReportId())
+                    .reportId(report.getReportId())
                     .implement(dailyReport.getImplement())
                     .users(users)
                     .projects(project)
@@ -95,7 +95,7 @@ public class DailyReportImpl implements DailyReportService {
             List<Implement> implement = implementRepository.findImplement(dailyReport.getProjectId(), userId, startOfDay, endOfDay);
             Implement firstImplement = implement.get(0);
 
-            report.setCreate_at(LocalDateTime.now());
+            report.setCreateAt(LocalDateTime.now());
             report.setEndDate(dailyReport.getEndDate());
             report.setStartDate(dailyReport.getStartDate());
 //            report.setUser(users);
