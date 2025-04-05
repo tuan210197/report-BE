@@ -9,7 +9,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileUploadDTO {
-    private Long projectId;
-    private String uid;
+public class FromDateToDateDTO {
+    private String from;
+    private String to;
 }

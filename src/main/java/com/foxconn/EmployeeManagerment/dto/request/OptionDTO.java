@@ -9,7 +9,8 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class FileUploadDTO {
-    private Long projectId;
+public class OptionDTO {
+    private Long id;
     private String uid;
+    private Long task;
 }

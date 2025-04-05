@@ -49,7 +49,7 @@ public class ScheduledReportService {
         html.append("<h3>尊敬的先生/小姐：</h3>");
         html.append("<h4 style=\"font-weight: lighter;\">您好，這是Fii越南資訊部的人員報告進度通知！</h4>");
         html.append("<h4 style=\"font-weight: lighter;\"> 您可以點擊以下鏈接進行查看。</h4>");
-        html.append(" <h4 style=\"font-weight: lighter;\">     點擊鏈接(內網): <a href=\"http://10.81.160.29:86/\" style=\"font-weight: bold;\">http://10.81.160.29:86/</a> </h4>");
+        html.append(" <h4 style=\"font-weight: lighter;\">     點擊鏈接(內網): <a href=\"http://10.81.160.29:86/detail-report\" style=\"font-weight: bold;\">专案系统</a> </h4>");
         html.append("<h4 style=\"font-weight: lighter;\"> 若您有疑問或遇到系統不方便使用的地方，請聯繫我們，謝謝！</h4> <br> <br>");
         html.append("<table border='1' cellspacing='0' cellpadding='8' style='border-collapse: collapse; width: 100%; max-width: 600px'>");
         html.append("<tr style='background-color: #f2f2f2;'>");

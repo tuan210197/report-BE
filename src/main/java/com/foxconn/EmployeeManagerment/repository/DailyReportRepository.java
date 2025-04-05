@@ -80,7 +80,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
     List<DailyReport> search(String keyword);
 
     @Query("SELECT d.user.fullName as reporterName, d.project.projectName as projectName, d.category.categoryName as categoryName, " +
-            "d.address as address, d.contractor as contractor, d.requester as requester, i.implement as implement " +
+            "d.address as address, d.contractor as contractor, d.requester as requester, i.implement as implement , d.createAt as createdAt" +
             " FROM DailyReport d join Implement i " +
             "on d.reportId = i.reportId " +
             "where CAST(d.createAt AS date) = :localDate " +
