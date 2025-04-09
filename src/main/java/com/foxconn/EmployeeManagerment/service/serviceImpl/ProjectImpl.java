@@ -38,7 +38,7 @@ public class ProjectImpl extends BaseController implements ProjectService {
     private final CateRepository cateRepository;
     private final UserRepository userRepository;
 
-    public ProjectImpl(ProjectRepository projectRepository,  CateRepository cateRepository, UserRepository userRepository,
+    public ProjectImpl(ProjectRepository projectRepository, CateRepository cateRepository, UserRepository userRepository,
                        CategoryRepository categoryRepository,
                        StatusRepository statusRepository,
                        StatusUpdateHisRepository statusUpdateHisRepository) {
@@ -117,7 +117,9 @@ public class ProjectImpl extends BaseController implements ProjectService {
         Users user = userRepository.findByUid(project.getPic());
         Project projectCheck = projectRepository.findByProjectId(project.getProjectId());
         Assert.notNull(projectCheck, "PROJECT_NOT_FOUND");
-
+        Category category = categoryRepository.findById(project.getCategoryId()).orElseThrow(
+                () -> new RuntimeException("Category not found")
+        );
         LocalDate dateTime = project.getStartDate();
         Integer year = getYearFromDateTime(dateTime);
 
@@ -142,6 +144,8 @@ public class ProjectImpl extends BaseController implements ProjectService {
         projectCheck.setYear(year);
 
         projectCheck.setPic(user);
+        projectCheck.setProjectName(project.getProjectName());
+        projectCheck.setCategory(category);
         projectRepository.save(projectCheck);
 
         return true;
@@ -154,17 +158,13 @@ public class ProjectImpl extends BaseController implements ProjectService {
 
     @Override
     public List<Project> findProjectByUserId(String uid) {
-
         return projectRepository.checkProjectByUserId(uid);
 //    return projectRepository.findAll();
     }
 
-
     @Override
     public Boolean checkOwnerProject(String uid, Long projectId) {
-
         return !Objects.equals(projectRepository.checkOwnerProject(uid, projectId), "NO");
-
     }
 
     @Override
@@ -176,7 +176,6 @@ public class ProjectImpl extends BaseController implements ProjectService {
     public List<ChartDto> getDashboardFromTo(int from, int to) {
         return projectRepository.getChartFromTo(from, to);
     }
-
 
     @Override
     public List<CategoryCountDTO> getTotal() {
@@ -245,7 +244,6 @@ public class ProjectImpl extends BaseController implements ProjectService {
         statusUpdateHisRepository.save(statusUpdateHis);
         return true; // Không cập nhật (do không tìm thấy hoặc trạng thái đã là true)
     }
-
 
 
     @Override
@@ -318,16 +316,13 @@ public class ProjectImpl extends BaseController implements ProjectService {
     @Override
     public boolean deleteProject(Long projectId, String userId) {
         Users user = userRepository.findByUid(userId);
-
         Project project = projectRepository.findByProjectId(projectId);
         Assert.notNull(project, "PROJECT_NOT_FOUND");
         if (project.getIsDeleted()) {
             throw new RuntimeException("PROJECT_DELETED");
         } else {
             projectRepository.deleteProject(projectId, user.getUid());
-
             return true;
         }
     }
-
 }

@@ -53,4 +53,5 @@ public interface ProjectService {
     List<ChartDto> getDashboardFromTo(int from, int to);
 
     List<Project> searchChartFromTo(FromToDTO dto);
+
 }
