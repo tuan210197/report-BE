@@ -13,8 +13,12 @@ import com.foxconn.EmployeeManagerment.service.DailyReportService;
 import com.foxconn.EmployeeManagerment.service.ProjectService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,15 +33,16 @@ import java.util.List;
 public class DailyReportController extends BaseController {
 
     private final DailyReportService dailyReportService;
-    private final ProjectService projectService;
     private final ProjectRepository projectRepository;
     private final DailyReportRepository dailyReportRepository;
 
-    public DailyReportController(DailyReportService dailyReportService, ProjectService projectService, ProjectRepository projectRepository, DailyReportRepository dailyReportRepository) {
+
+
+    public DailyReportController(DailyReportService dailyReportService, ProjectRepository projectRepository, DailyReportRepository dailyReportRepository) {
         this.dailyReportService = dailyReportService;
-        this.projectService = projectService;
         this.projectRepository = projectRepository;
         this.dailyReportRepository = dailyReportRepository;
+        ;
     }
 
     @PostMapping("/add")
@@ -72,33 +77,37 @@ public class DailyReportController extends BaseController {
     }
 
     @GetMapping("/get-all")
-    public ResponseEntity<List<DailyReport>> getAllDailyReports() {
-        List<DailyReport> dailyReportsList = dailyReportService.getAllDailyReports();
-        return ResponseEntity.ok(dailyReportsList);
+    public ResponseEntity<?> getAllDailyReports(@RequestParam(defaultValue = "0") int page,
+                                                @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+
+        Page<DailyReport> dailyReportsList = dailyReportService.getAllDailyReports(pageable);
+        if (dailyReportsList.getContent().isEmpty()) {
+            return toExceptionResult(null, Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+        } else {
+            return toSuccessResult(dailyReportsList, "SUCCESS");
+        }
+//        return ResponseEntity.ok(dailyReportsList);
     }
 
-//    @GetMapping("/get-by-project/{projectId}")
-//    public ResponseEntity<List<DailyReport>> getDailyReportsByProjectId(@PathVariable Long projectId) {
-//        List<DailyReport> dailyReportsList = dailyReportService.getDailyReportsByProjectId(projectId);
-//        return ResponseEntity.ok(dailyReportsList);
-//    }
-
-//    @GetMapping("/get-by-user/{userImplement}")
-//    public ResponseEntity<List<DailyReport>> getDailyReportsByUserImplement(@PathVariable String userImplement) {
-//        List<DailyReport> dailyReportsList = dailyReportService.getDailyReportsByUserImplement(userImplement);
-//        return ResponseEntity.ok(dailyReportsList);
-//    }
-
     @GetMapping("/find-by-uuid")
-    public ResponseEntity<?> findDailyReportByUuid(HttpServletRequest request) {
+
+    public ResponseEntity<?> findDailyReportByUuid(HttpServletRequest request,
+                                                   @RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "5") int size) {
+        Pageable pageable = PageRequest.of(page, size);
         UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         if (userDetails != null && userDetails.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))) {
-            List<DailyReport> dailyReports = dailyReportService.getAllDailyReports();
-            return ResponseEntity.ok(dailyReports);
+            Page<DailyReport> dailyReports = dailyReportService.getAllDailyReports(pageable);
+            return toSuccessResult(dailyReports, "SUCCESS");
         } else {
             String uid = this.getCurrentUser().getUid().trim();
-            List<DailyReport> dailyReports = dailyReportService.getDailyReportsByUserImplement(uid);
-            return ResponseEntity.ok(dailyReports);
+            Page<DailyReport> dailyReports = dailyReportService.getDailyReportsByUserImplement(uid, pageable);
+            if (dailyReports.getContent().isEmpty()) {
+                return toExceptionResult(null, Const.API_RESPONSE.RETURN_CODE_ERROR_NOTFOUND);
+            } else {
+                return toSuccessResult(dailyReports, "SUCCESS");
+            }
         }
     }
 
@@ -144,7 +153,7 @@ public class DailyReportController extends BaseController {
         List<DailyReport> list = dailyReportService.search(dto.getKeyword());
         if (list != null) {
             return toSuccessResult(list, "SUCCESS");
-        }else{
+        } else {
             return toExceptionResult(null, Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
     }

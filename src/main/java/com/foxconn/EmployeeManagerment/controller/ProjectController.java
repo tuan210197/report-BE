@@ -43,8 +43,7 @@ public class ProjectController extends BaseController {
         try {
             UserDetails auth = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if (auth != null && auth.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals("GD"))) {
-                String uid = getCurrentUser().getUid().trim();
-                Long projectId = projectService.createProject(projectDto, uid);
+                Long projectId = projectService.createProject(projectDto);
                 if (projectId != null) {
                     return toSuccessResult(projectId, "CREATE PROJECT SUCCESS");
                 } else {
@@ -94,9 +93,7 @@ public class ProjectController extends BaseController {
     // get all project by user id
     @GetMapping(value = "/get-by-userid")
     public ResponseEntity<?> getByUserId(HttpServletRequest request) {
-        String uid = this.getCurrentUser().getUid().trim();
-        log.info(uid);
-        List<Project> projects = projectService.findProjectByUserId(uid);
+        List<Project> projects = projectService.findProjectByUserId();
         return ResponseEntity.ok(projects);
 
     }

@@ -73,5 +73,7 @@ public class ProjectDTO {
 
     private String type;
 
+    private String location;
+
 
 }

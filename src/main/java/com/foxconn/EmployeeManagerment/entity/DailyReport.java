@@ -65,6 +65,9 @@ public class DailyReport {
     @Column(name = "end_date")
     private LocalDate endDate;
 
+    @Column(name = "implement")
+    private String implement;
+
     @ManyToOne
     @JoinColumn(name = "project_id", nullable = false) // Định nghĩa khóa ngoại
     private Project project;

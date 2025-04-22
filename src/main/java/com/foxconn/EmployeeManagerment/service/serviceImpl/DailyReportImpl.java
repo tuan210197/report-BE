@@ -6,6 +6,8 @@ import com.foxconn.EmployeeManagerment.repository.*;
 import com.foxconn.EmployeeManagerment.service.DailyReportService;
 import io.jsonwebtoken.lang.Assert;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -69,26 +71,26 @@ public class DailyReportImpl implements DailyReportService {
                     .quantityRemain(dailyReport.getQuantityRemain())
                     .requester(dailyReport.getRequester())
                     .project(project)
-                    .build();
-
-
-
-            report = dailyReportRepository.save(report);
-            Implement implement = Implement.builder()
-                    .createAt(LocalDateTime.now())
-                    .reportId(report.getReportId())
                     .implement(dailyReport.getImplement())
-                    .users(users)
-                    .projects(project)
                     .build();
-//            project.setProgress(dailyReport.getProgress().intValue());
-//            projectRepository.save(project);
-            if (Objects.nonNull(report.getReportId())) {
-                implement = implementRepository.save(implement);
-                return true;
-            } else {
-                return false;
-            }
+
+
+            dailyReportRepository.save(report);
+//            Implement implement = Implement.builder()
+//                    .createAt(LocalDateTime.now())
+//                    .reportId(report.getReportId())
+//                    .implement(dailyReport.getImplement())
+//                    .users(users)
+//                    .projects(project)
+//                    .build();
+////            project.setProgress(dailyReport.getProgress().intValue());
+////            projectRepository.save(project);
+//            if (Objects.nonNull(report.getReportId())) {
+//                implement = implementRepository.save(implement);
+            return true;
+//            } else {
+//                return false;
+//            }
         } else if (check.size() == 1) {
             log.info("single daily report");
             DailyReport report = check.get(0);
@@ -109,11 +111,12 @@ public class DailyReportImpl implements DailyReportService {
 //            report.setProject(project);
 //            report.setProgress(dailyReport.getProgress());
             report.setAddress(report.getAddress());
+            report.setImplement(report.getImplement());
 
             dailyReportRepository.save(report);
-            firstImplement.setCreateAt(LocalDateTime.now());
-            firstImplement.setImplement(dailyReport.getImplement());
-            implementRepository.save(firstImplement);
+//            firstImplement.setCreateAt(LocalDateTime.now());
+//            firstImplement.setImplement(dailyReport.getImplement());
+//            implementRepository.save(firstImplement);
             return true;
         } else {
             log.info("multiple daily report");
@@ -133,8 +136,12 @@ public class DailyReportImpl implements DailyReportService {
     }
 
     @Override
-    public List<DailyReport> getAllDailyReports() {
-        return dailyReportRepository.findAllDailyReport();
+//    @Cacheable(value = "dailyReportCache", key = "#page + '-' + #size")
+    @Cacheable(value = "dailyReportCache",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<DailyReport> getAllDailyReports(Pageable pageable) {
+        log.info("Fetching data from database for page: {}", pageable.getPageNumber());
+        return dailyReportRepository.findAllDailyReport(pageable);
     }
 
 //    @Override
@@ -143,8 +150,10 @@ public class DailyReportImpl implements DailyReportService {
 //    }
 
     @Override
-    public List<DailyReport> getDailyReportsByUserImplement(String userDetails) {
-        return dailyReportRepository.findByUerDetail(userDetails);
+    @Cacheable(value = "dailyReportCache",
+            key = "#pageable.pageNumber + '-' + #pageable.pageSize")
+    public Page<DailyReport> getDailyReportsByUserImplement(String userDetails, Pageable pageable) {
+        return dailyReportRepository.findByUerDetail(userDetails, pageable);
     }
 
     @Override

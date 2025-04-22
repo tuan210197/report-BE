@@ -9,6 +9,8 @@ import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted;
 import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2;
 import com.foxconn.EmployeeManagerment.entity.Project;
 import com.foxconn.EmployeeManagerment.projection.ProjectProjection;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -18,13 +20,14 @@ public interface ProjectService {
 
     Project getAllproject();
 
-    Long createProject(ProjectDTO project, String userId) throws Exception;
+    Long createProject(ProjectDTO project) throws Exception;
 
     Boolean updateProject(String userId, ProjectDTO project);
 
     List<Project> getAllProject();
 
-    List<Project> findProjectByUserId(String uid);
+
+    List<Project> findProjectByUserId();
 
     Boolean checkOwnerProject(String uid, Long projectId);
 

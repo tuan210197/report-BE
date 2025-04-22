@@ -12,13 +12,14 @@ import com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2;
 import com.foxconn.EmployeeManagerment.entity.*;
 import com.foxconn.EmployeeManagerment.projection.ProjectProjection;
 import com.foxconn.EmployeeManagerment.repository.*;
-import com.foxconn.EmployeeManagerment.service.MailSenderService;
 import com.foxconn.EmployeeManagerment.service.ProjectService;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
+
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -62,8 +63,9 @@ public class ProjectImpl extends BaseController implements ProjectService {
     }
 
     @Override
-    public Long createProject(ProjectDTO projectDto, String userId) throws Exception {
-        Users user = userRepository.findByUid(userId);
+    @Transactional
+    public Long createProject(ProjectDTO projectDto) {
+        Users user = userRepository.findByUid(projectDto.getPic());
         Category category = cateRepository.getOneCategory(projectDto.getCategoryId());
         Status status = statusRepository.findById("new").orElseThrow(
                 () -> new RuntimeException("Status not found")
@@ -100,6 +102,7 @@ public class ProjectImpl extends BaseController implements ProjectService {
                 .year(projectDto.getYear())
                 .canceled(false)
                 .isDeleted(false)
+                .location(projectDto.getLocation())
                 .build();
         project = projectRepository.save(project);
 
@@ -146,19 +149,24 @@ public class ProjectImpl extends BaseController implements ProjectService {
         projectCheck.setPic(user);
         projectCheck.setProjectName(project.getProjectName());
         projectCheck.setCategory(category);
+        projectCheck.setLocation(project.getLocation());
         projectRepository.save(projectCheck);
 
         return true;
     }
 
+
+
     @Override
-    public List<Project> getAllProject() {
+    public List<Project> getAllProject( ) {
         return projectRepository.findAllProject();
     }
 
+
+
     @Override
-    public List<Project> findProjectByUserId(String uid) {
-        return projectRepository.checkProjectByUserId(uid);
+    public List<Project> findProjectByUserId() {
+        return projectRepository.checkProjectByUserId();
 //    return projectRepository.findAll();
     }
 

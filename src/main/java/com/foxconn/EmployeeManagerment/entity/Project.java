@@ -44,6 +44,9 @@ public class Project {
     @Column(name = "progress")
     private int progress;
 
+    @Column(name = "location")
+    private String location;
+
     @Column(name = "start_receive_request")
     private LocalDate startReceiveRequest;
 

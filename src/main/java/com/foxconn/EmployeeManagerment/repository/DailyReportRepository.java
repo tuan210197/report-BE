@@ -3,6 +3,7 @@ package com.foxconn.EmployeeManagerment.repository;
 import com.foxconn.EmployeeManagerment.entity.DailyReport;
 import com.foxconn.EmployeeManagerment.projection.DailyReportProjection;
 import com.foxconn.EmployeeManagerment.projection.DetailReportProjection;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -18,10 +19,10 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
 //    List<DailyReport> findByProjectId(Long projectId);
 
     @Query("SELECT  d FROM DailyReport d  WHERE trim(d.user.uid) = :uid order by d.createAt desc")
-    List<DailyReport> findByUerDetail(@Param("uid") String uid);
+    Page<DailyReport> findByUerDetail(@Param("uid") String uid, Pageable pageable);
 
     @Query("select d from DailyReport d order by d.createAt desc")
-    List<DailyReport> findAllDailyReport();
+    Page<DailyReport> findAllDailyReport(Pageable pageable);
 
     @Query("SELECT d FROM  DailyReport d where d.project.projectId =:projectId and trim(d.user.uid) = :userId order by d.createAt desc")
     List<DailyReport> findByProjectId(@Param("userId") String userId, @Param("projectId") Long projectId, Pageable pageable);
@@ -43,7 +44,6 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
                     r.address AS address, 
                     r.contractor AS contractor,
                     r.number_worker AS numberWorker,
-
                     r.quantity AS quantity,
                     r.quantity_completed AS quantityCompleted,
                     r.quantity_remain AS quantityRemain,
@@ -75,6 +75,7 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
                                  @Param("userId") String userId,
                                  @Param("startOfDay") LocalDateTime startOfDay,
                                  @Param("endOfDay") LocalDateTime endOfDay);
+
     @Query("SELECT d FROM DailyReport d where upper(coalesce(d.project.projectName,'')) like %:keyword% " +
             "or upper(COALESCE(d.user.fullName, '')) LIKE %:keyword%")
     List<DailyReport> search(String keyword);
