@@ -6,6 +6,7 @@ import com.foxconn.EmployeeManagerment.dto.request.ImplementDto;
 import com.foxconn.EmployeeManagerment.entity.Implement;
 import com.foxconn.EmployeeManagerment.entity.Users;
 import com.foxconn.EmployeeManagerment.projection.DetailReportProjection;
+import com.foxconn.EmployeeManagerment.projection.ImplementProjection;
 import com.foxconn.EmployeeManagerment.repository.DailyReportRepository;
 import com.foxconn.EmployeeManagerment.service.ImplementService;
 import lombok.extern.slf4j.Slf4j;
@@ -53,7 +54,7 @@ public class ImplementController extends BaseController {
 
     @GetMapping("/get/{id}")
     public ResponseEntity<?> getImplementById(@PathVariable Long id) {
-        List<Implement> implement = implementService.getImplementById(id);
+        List<ImplementProjection> implement = implementService.getImplementById(id);
         return ResponseEntity.ok(implement);
     }
 
@@ -71,11 +72,11 @@ public class ImplementController extends BaseController {
 
     @PostMapping("/get-implement-by-project")
     public ResponseEntity<?> getImplementsByProject(@RequestBody Long projectId) {
-        List<String> implement = implementService.getImplementByProject(projectId);
+        String implement = implementService.getImplementByProject(projectId);
         if (implement != null) {
             return toSuccessResult(implement, "SUCCESS");
         } else {
-            return toExceptionResult("No implementation found", Const.API_RESPONSE.RETURN_CODE_ERROR);
+            return toSuccessResult(null, "NO DATA");
         }
     }
 

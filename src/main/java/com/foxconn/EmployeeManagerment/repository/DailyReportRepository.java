@@ -71,19 +71,24 @@ public interface DailyReportRepository extends JpaRepository<DailyReport, Long> 
             "WHERE d.user.uid = :userId " +
             "AND d.project.projectId = :projectId " +
             "AND d.createAt BETWEEN :startOfDay AND :endOfDay")
-   List<DailyReport>  checkDailyReport(@Param("projectId") Long projectId,
-                                 @Param("userId") String userId,
-                                 @Param("startOfDay") LocalDateTime startOfDay,
-                                 @Param("endOfDay") LocalDateTime endOfDay);
+    List<DailyReport> checkDailyReport(@Param("projectId") Long projectId,
+                                       @Param("userId") String userId,
+                                       @Param("startOfDay") LocalDateTime startOfDay,
+                                       @Param("endOfDay") LocalDateTime endOfDay);
 
     @Query("SELECT d FROM DailyReport d where upper(coalesce(d.project.projectName,'')) like %:keyword% " +
             "or upper(COALESCE(d.user.fullName, '')) LIKE %:keyword%")
     List<DailyReport> search(String keyword);
 
-    @Query("SELECT d.user.fullName as reporterName, d.project.projectName as projectName, d.category.categoryName as categoryName, " +
-            "d.address as address, d.contractor as contractor, d.requester as requester, i.implement as implement , d.createAt as createdAt" +
-            " FROM DailyReport d join Implement i " +
-            "on d.reportId = i.reportId " +
+    //    @Query("SELECT d.user.fullName as reporterName, d.project.projectName as projectName, d.category.categoryName as categoryName, " +
+//            "d.address as address, d.contractor as contractor, d.requester as requester, i.implement as implement , d.createAt as createdAt" +
+//            " FROM DailyReport d join Implement i " +
+//            "on d.reportId = i.reportId " +
+//            "where CAST(d.createAt AS date) = :localDate " +
+//            "order by d.user.fullName asc")
+    @Query("select d.user.fullName as reporterName, d.project.projectName as projectName, d.category.categoryName as categoryName," +
+            "d.address as address, d.contractor as contractor, d.requester as requester, d.implement as implement , d.createAt as createdAt " +
+            "from DailyReport  d " +
             "where CAST(d.createAt AS date) = :localDate " +
             "order by d.user.fullName asc")
     List<DetailReportProjection> getDetailReport(@Param("localDate") LocalDate localDate);

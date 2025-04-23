@@ -1,13 +1,17 @@
 package com.foxconn.EmployeeManagerment.service.serviceImpl;
 
 import com.foxconn.EmployeeManagerment.dto.request.ImplementDto;
+import com.foxconn.EmployeeManagerment.entity.DailyReport;
 import com.foxconn.EmployeeManagerment.entity.Implement;
 import com.foxconn.EmployeeManagerment.entity.Project;
 import com.foxconn.EmployeeManagerment.entity.Users;
+import com.foxconn.EmployeeManagerment.projection.ImplementProjection;
 import com.foxconn.EmployeeManagerment.repository.ImplementRepository;
 import com.foxconn.EmployeeManagerment.repository.ProjectRepository;
 import com.foxconn.EmployeeManagerment.repository.UserRepository;
 import com.foxconn.EmployeeManagerment.service.ImplementService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -67,7 +71,7 @@ public class ImplementImpl implements ImplementService {
     }
 
     @Override
-    public List<Implement> getImplementById(Long id) {
+    public List<ImplementProjection> getImplementById(Long id) {
         return implementRepository.findByProjectId(id);
     }
 
@@ -82,9 +86,9 @@ public class ImplementImpl implements ImplementService {
     }
 
     @Override
-    public List<String> getImplementByProject(Long projectId) {
-        List<Implement> list = implementRepository.getImplementByProjects(projectId);
-        return list.stream().map(Implement::getImplement).toList();
+    public String getImplementByProject(Long projectId) {
+        Page<DailyReport> list = implementRepository.getImplementByProjects(projectId, PageRequest.of(0, 1));
+        return list.stream().findFirst().map(DailyReport::getImplement) .orElse(null);
     }
 
 //    @Override
