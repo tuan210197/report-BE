@@ -16,6 +16,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Repository
@@ -80,6 +81,24 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "ORDER BY c.categoryName")
     List<ChartDto> getChartFromTo(@Param("from") int from, @Param("to") int to);
 
+
+    @Query("SELECT new com.foxconn.EmployeeManagerment.dto.response.ChartDto( " +
+            "c.categoryName, " +
+            "COUNT(p.projectId), " +
+            "SUM(CASE WHEN p.status.statusId = 'completed' THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN p.status.statusId ='construction' THEN 1 ELSE 0 END), " +
+            "Sum(CASE WHEN p.status.statusId ='acceptance' THEN 1 ELSE 0 END)," +
+            "SUM(CASE WHEN p.status.statusId not in  ('completed','acceptance','construction', 'cancelled') THEN 1 ELSE 0 END), " +
+            "SUM(CASE WHEN p.status.statusId = 'cancelled' THEN 1 ELSE 0 END)) " +
+            "FROM Category c " +
+            "LEFT JOIN c.projects p " +
+            "on p.isDeleted = false " +
+            "and p.startDate  between  :from and :to " +
+            "GROUP BY c.categoryId, c.categoryName " +
+            "ORDER BY c.categoryName")
+    List<ChartDto> getChartFromDateToDate(@Param("from") LocalDate from, @Param("to") LocalDate to);
+
+
     @Query("SELECT new com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO(p.category.categoryName, COUNT(p)) " +
             "FROM Project p GROUP BY p.category.categoryName")
     List<CategoryCountDTO> getTotal();
@@ -105,6 +124,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "COUNT(CASE WHEN p.status.statusId = 'completed' THEN 1 END))" +
             " FROM Project p where p.year between :from and :to and  p.isDeleted = false ")
     List<ProjectCompleted2> getTotalFromTo(@Param("from") int from, @Param("to") int to);
+
+    @Query("select new com.foxconn.EmployeeManagerment.dto.response.ProjectCompleted2("
+            + "COUNT(p) ," +
+            "COUNT(CASE WHEN p.canceled = true THEN 1 END) ," +
+            "COUNT(CASE WHEN p.status.statusId not in ('completed','acceptance','construction', 'cancelled' ) THEN 1 END) ," +
+            "COUNT(CASE WHEN p.status.statusId = 'completed' THEN 1 END))" +
+            " FROM Project p where p.startDate between :from and :to and  p.isDeleted = false ")
+    List<ProjectCompleted2> getTotalFromTo(@Param("from") LocalDate from, @Param("to") LocalDate to);
 
 
     @Query("SELECT p.projectId AS projectId, p.projectName AS projectName " +
@@ -150,6 +177,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                    @Param("from") int from,
                                    @Param("to") int to);
 
+    @Query("SELECT p FROM Project p WHERE  p.category.categoryId = :categoryId " +
+            "AND p.status.statusId = :status " +
+            "and p.isDeleted = false and p.startDate  between  :from and :to ")
+    List<Project> getByChartFromDateToDate(@Param("categoryId") String categoryId,
+                                   @Param("status") String status,
+                                   @Param("from") LocalDate from,
+                                   @Param("to") LocalDate to);
+
     @Query("select p from Project  p where p.isDeleted = false " +
             "and p.completed = false and p.accepted = true " +
             "and p.status.statusId =:status " +
@@ -183,6 +218,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                           @Param("status") String status,
                                           @Param("from") int from,
                                           @Param("to") int to);
+    @Query("select p from Project  p where p.isDeleted = false " +
+            "and p.completed = false and p.accepted = true " +
+            "and p.status.statusId =:status " +
+            "and p.category.categoryId =:categoryId " +
+            "and p.startDate  between  :from and :to ")
+    List<Project> getAcceptanceDataFromDateToDate(@Param("categoryId") String categoryId,
+                                          @Param("status") String status,
+                                          @Param("from") LocalDate from,
+                                          @Param("to") LocalDate to);
 
     @Query("select p from Project  p where p.isDeleted = false " +
             "and p.completed = false and p.accepted = FALSE " +
@@ -194,6 +238,16 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
                                           @Param("from") int from,
                                           @Param("to") int to);
 
+    @Query("select p from Project  p where p.isDeleted = false " +
+            "and p.completed = false and p.accepted = FALSE " +
+//            "and p.status.statusId =:status " +
+            "and p.category.categoryId =:categoryId " +
+            "and p.startDate  between  :from and :to ")
+    List<Project> getInProgressDataFromDateToDate(@Param("categoryId") String categoryId,
+//                                          @Param("status") String status,
+                                          @Param("from") LocalDate from,
+                                          @Param("to") LocalDate to);
+
     @Query("select p from Project p where p.accepted = true  " +
             "and p.category.categoryId =:categoryId " +
             "and p.isDeleted = false " +
@@ -201,6 +255,14 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> getAcceptanceDataTotalFromTo(@Param("categoryId") String categoryId,
                                                @Param("from") int from,
                                                @Param("to") int to);
+
+    @Query("select p from Project p where p.accepted = true  " +
+            "and p.category.categoryId =:categoryId " +
+            "and p.isDeleted = false " +
+            "and p.startDate  between  :from and :to ")
+    List<Project> getAcceptanceDataTotalFromDateToDate(@Param("categoryId") String categoryId,
+                                               @Param("from") LocalDate from,
+                                               @Param("to") LocalDate to);
 
     @Query("select p from Project p where p.accepted = false  " +
             "and p.completed = false  " +
@@ -210,6 +272,15 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
     List<Project> getInProgressDataTotalFromTo(@Param("categoryId") String categoryId,
                                                @Param("from") int from,
                                                @Param("to") int to);
+
+    @Query("select p from Project p where p.accepted = false  " +
+            "and p.completed = false  " +
+            "and p.isDeleted = false  " +
+            "and p.category.categoryId =:categoryId " +
+            "and p.startDate  between  :from and :to ")
+    List<Project> getInProgressDataTotalFromDateToDate(@Param("categoryId") String categoryId,
+                                               @Param("from") LocalDate from,
+                                               @Param("to") LocalDate to);
 
     @Query(value = "SELECT " +
             "    MIN(EXTRACT(YEAR FROM start_date)) AS minYear," +

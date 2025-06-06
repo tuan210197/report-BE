@@ -50,7 +50,8 @@ public class DailyReportImpl implements DailyReportService {
         Users users = userRepository.findByUid(userId);
         Assert.notNull(project, "PROJECT NOT FOUND");
         Assert.notNull(category, "CATEGORY NOT FOUND");
-
+        log.info(startOfDay.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        log.info(endOfDay.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         List<DailyReport> check = dailyReportRepository.checkDailyReport(dailyReport.getProjectId(), userId, startOfDay, endOfDay);
         if (check.isEmpty()) {
@@ -83,8 +84,8 @@ public class DailyReportImpl implements DailyReportService {
 //                    .users(users)
 //                    .projects(project)
 //                    .build();
-////            project.setProgress(dailyReport.getProgress().intValue());
-////            projectRepository.save(project);
+//            project.setProgress(dailyReport.getProgress().intValue());
+//            projectRepository.save(project);
 //            if (Objects.nonNull(report.getReportId())) {
 //                implement = implementRepository.save(implement);
             return true;
@@ -94,8 +95,8 @@ public class DailyReportImpl implements DailyReportService {
         } else if (check.size() == 1) {
             log.info("single daily report");
             DailyReport report = check.get(0);
-            List<Implement> implement = implementRepository.findImplement(dailyReport.getProjectId(), userId, startOfDay, endOfDay);
-            Implement firstImplement = implement.get(0);
+//            List<Implement> implement = implementRepository.findImplement(dailyReport.getProjectId(), userId, startOfDay, endOfDay);
+//            Implement firstImplement = implement.get(0);
 
             report.setCreateAt(LocalDateTime.now());
             report.setEndDate(dailyReport.getEndDate());
@@ -110,8 +111,8 @@ public class DailyReportImpl implements DailyReportService {
             report.setRequester(dailyReport.getRequester());
 //            report.setProject(project);
 //            report.setProgress(dailyReport.getProgress());
-            report.setAddress(report.getAddress());
-            report.setImplement(report.getImplement());
+            report.setAddress(dailyReport.getAddress());
+            report.setImplement(dailyReport.getImplement());
 
             dailyReportRepository.save(report);
 //            firstImplement.setCreateAt(LocalDateTime.now());

@@ -11,7 +11,7 @@ public interface DailyReportProjection {
     String getAddress();
     String getContractor();
     Integer getNumberWorker();
-    Integer getProgress();
+//    Integer getProgress();
     Integer getQuantity();
     Integer getQuantityCompleted();
     Integer getQuantityRemain();

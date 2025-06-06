@@ -8,6 +8,7 @@ import com.foxconn.EmployeeManagerment.repository.CalendarOptionRepository;
 import com.foxconn.EmployeeManagerment.repository.CalendarRepository;
 import com.foxconn.EmployeeManagerment.repository.UserRepository;
 import com.foxconn.EmployeeManagerment.service.CalendarService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -22,6 +23,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class CalendarServiceImpl implements CalendarService {
 
@@ -77,6 +79,7 @@ public class CalendarServiceImpl implements CalendarService {
                 // Kiểm tra nếu ngày đã tồn tại trong DB
                 if (calendar != null) {
                     errors.add("Dòng " + rowIndex );
+                    throw new  IllegalArgumentException("Ngày: "+date + " đã tồn tại");
                 }
                 CalendarOption task = calendarOptionRepository.findById(1L).orElseThrow(
                         () -> new IllegalArgumentException("Invalid option id: " + 1)
@@ -91,6 +94,7 @@ public class CalendarServiceImpl implements CalendarService {
                 validList.add(wl);
             } catch (Exception e) {
                 errors.add("Dòng " + rowIndex + " lỗi: " + e.getMessage());
+                log.info(e.getMessage());
             }
             rowIndex++;
         }

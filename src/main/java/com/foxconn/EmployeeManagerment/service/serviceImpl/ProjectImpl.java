@@ -2,6 +2,7 @@ package com.foxconn.EmployeeManagerment.service.serviceImpl;
 
 import com.foxconn.EmployeeManagerment.common.Const;
 import com.foxconn.EmployeeManagerment.controller.BaseController;
+import com.foxconn.EmployeeManagerment.dto.request.FromDateToDateDTO;
 import com.foxconn.EmployeeManagerment.dto.request.FromToDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
@@ -24,6 +25,7 @@ import org.springframework.util.Assert;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
@@ -103,6 +105,7 @@ public class ProjectImpl extends BaseController implements ProjectService {
                 .canceled(false)
                 .isDeleted(false)
                 .location(projectDto.getLocation())
+                .accepted(false)
                 .build();
         project = projectRepository.save(project);
 
@@ -186,6 +189,15 @@ public class ProjectImpl extends BaseController implements ProjectService {
     }
 
     @Override
+    public List<ChartDto> getDashboardFromDateToDate(String from, String to) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse(from, formatter);
+        LocalDate endDate = LocalDate.parse(to, formatter);
+        return projectRepository.getChartFromDateToDate(startDate, endDate);
+
+    }
+
+    @Override
     public List<CategoryCountDTO> getTotal() {
         return projectRepository.getTotal();
     }
@@ -208,6 +220,15 @@ public class ProjectImpl extends BaseController implements ProjectService {
     @Override
     public List<ProjectCompleted2> getTotalFromTo(int fromYear, int toYear) {
         return projectRepository.getTotalFromTo(fromYear, toYear);
+    }
+
+    @Override
+    public List<ProjectCompleted2> getTotalFromTo(String from, String to) {
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate startDate = LocalDate.parse(from, formatter);
+        LocalDate endDate = LocalDate.parse(to, formatter);
+        return projectRepository.getTotalFromTo(startDate, endDate);
     }
 
     @Override
@@ -319,6 +340,34 @@ public class ProjectImpl extends BaseController implements ProjectService {
             }
         }
 //        return projectRepository.getByChartFromTo(categoryId, completed, cancelled, from, to);
+    }
+
+    @Override
+    public List<Project> searchChartFromTo(FromDateToDateDTO dto) {
+        Category category = categoryRepository.findByCategoryName(dto.getCategoryName());
+        Assert.notNull(category, "CATEGORY_NOT_FOUND");
+        String categoryId = category.getCategoryId();
+//        Boolean completed = dto.getCompleted();
+//        Boolean cancelled = dto.getCancelled();
+        LocalDate from = LocalDate.parse(dto.getFrom());
+        LocalDate to = LocalDate.parse(dto.getTo());
+        if (dto.getType().contains("Total")) {
+            if (dto.getType().equals("acceptanceTotal")) {
+                return projectRepository.getAcceptanceDataTotalFromDateToDate(categoryId, from, to);
+            } else if (dto.getType().equals("remainTotal")) {
+                return projectRepository.getInProgressDataTotalFromDateToDate(categoryId, from, to);
+            } else {
+                return projectRepository.getByChartFromDateToDate(categoryId, dto.getStatus(), from, to);
+            }
+        } else {
+            if (dto.getType().equals("acceptance")) {
+                return projectRepository.getAcceptanceDataFromDateToDate(categoryId, dto.getStatus(), from, to);
+            } else if (dto.getType().equals("remain")) {
+                return projectRepository.getInProgressDataFromDateToDate(categoryId, from, to);
+            } else {
+                return projectRepository.getByChartFromDateToDate(categoryId, dto.getStatus(), from, to);
+            }
+        }
     }
 
     @Override

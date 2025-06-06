@@ -2,6 +2,7 @@ package com.foxconn.EmployeeManagerment.controller;
 
 
 import com.foxconn.EmployeeManagerment.common.Const;
+import com.foxconn.EmployeeManagerment.dto.request.FromDateToDateDTO;
 import com.foxconn.EmployeeManagerment.dto.request.FromToDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
@@ -131,6 +132,11 @@ public class ProjectController extends BaseController {
         return ResponseEntity.ok(projectService.getDashboardFromTo(dto.getFrom(), dto.getTo()));
     }
 
+    @PostMapping(value = "/dashboard-from-date-to-date")
+    public ResponseEntity<?> getDashboardFromDateToDate(@RequestBody FromDateToDateDTO dto) {
+        return ResponseEntity.ok(projectService.getDashboardFromDateToDate(dto.getFrom(), dto.getTo()));
+    }
+
 
     @GetMapping("/get-total")
     public ResponseEntity<?> getTotal(HttpServletRequest request) {
@@ -149,6 +155,11 @@ public class ProjectController extends BaseController {
 
     @PostMapping("/get-from-to")
     public ResponseEntity<?> getFromTo(HttpServletRequest request, @RequestBody FromToDTO dto) {
+        return ResponseEntity.ok(projectService.getTotalFromTo(dto.getFrom(), dto.getTo()));
+    }
+
+    @PostMapping("/get-from-date-to-date")
+    public ResponseEntity<?> getFromDateToDate(HttpServletRequest request, @RequestBody FromDateToDateDTO dto) {
         return ResponseEntity.ok(projectService.getTotalFromTo(dto.getFrom(), dto.getTo()));
     }
 
@@ -197,6 +208,18 @@ public class ProjectController extends BaseController {
             return toExceptionResult("NO DATA", Const.API_RESPONSE.RETURN_CODE_ERROR);
         }
     }
+
+    @PostMapping("/search-chart-from-date-to-date")
+    public ResponseEntity<?> searchChartFromDateToDate(HttpServletRequest request, @RequestBody FromDateToDateDTO dto) {
+        List<Project> projects = projectService.searchChartFromTo(dto);
+        if (!projects.isEmpty()) {
+            return toSuccessResult(projects, "SUCCESS");
+        } else {
+            return toExceptionResult("NO DATA", Const.API_RESPONSE.RETURN_CODE_ERROR);
+        }
+    }
+
+
 
     @PostMapping("/search-by-name")
     public ResponseEntity<?> searchByName(HttpServletRequest request, @RequestBody ProjectDTO projectDTO) {

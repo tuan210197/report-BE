@@ -1,5 +1,6 @@
 package com.foxconn.EmployeeManagerment.service;
 
+import com.foxconn.EmployeeManagerment.dto.request.FromDateToDateDTO;
 import com.foxconn.EmployeeManagerment.dto.request.FromToDTO;
 import com.foxconn.EmployeeManagerment.dto.request.ProjectUpdateDTO;
 import com.foxconn.EmployeeManagerment.dto.response.CategoryCountDTO;
@@ -53,8 +54,15 @@ public interface ProjectService {
 
     List<ProjectCompleted2> getTotalFromTo(int from, int to);
 
+    List<ProjectCompleted2> getTotalFromTo(String from, String to);
+
+
     List<ChartDto> getDashboardFromTo(int from, int to);
 
+    List<ChartDto> getDashboardFromDateToDate(String from, String to);
+
     List<Project> searchChartFromTo(FromToDTO dto);
+
+    List<Project> searchChartFromTo(FromDateToDateDTO dto);
 
 }

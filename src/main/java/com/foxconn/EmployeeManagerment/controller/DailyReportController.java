@@ -6,24 +6,21 @@ import com.foxconn.EmployeeManagerment.dto.request.DailyReportSearchDTO;
 import com.foxconn.EmployeeManagerment.dto.request.DateDTO;
 import com.foxconn.EmployeeManagerment.entity.DailyReport;
 import com.foxconn.EmployeeManagerment.entity.Project;
-import com.foxconn.EmployeeManagerment.projection.DailyReportProjection;
 import com.foxconn.EmployeeManagerment.repository.DailyReportRepository;
 import com.foxconn.EmployeeManagerment.repository.ProjectRepository;
 import com.foxconn.EmployeeManagerment.service.DailyReportService;
-import com.foxconn.EmployeeManagerment.service.ProjectService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -128,7 +125,10 @@ public class DailyReportController extends BaseController {
 
     @PostMapping("/export")
     public ResponseEntity<?> exportDailyReport(HttpServletRequest request, @RequestBody DateDTO dto) {
-        return ResponseEntity.ok(dailyReportRepository.export(dto.getDate()));
+        LocalDateTime start = LocalDate.parse(dto.getDate()).atStartOfDay();
+
+        LocalDateTime end = LocalDate.parse(dto.getDate()).plusDays(1).atStartOfDay();
+        return ResponseEntity.ok(dailyReportRepository.export(start, end));
 
     }
 
